@@ -6,6 +6,8 @@ import appdirs
 
 import click
 
+from munch import munchify
+
 from ptpython import repl
 
 from . import Requirement, util
@@ -29,6 +31,8 @@ def main(source_dir, **options):
     """
     Extract metadata from Python source distributions
     """
+
+    options = munchify(options)
 
     if options.color:
         cfg.logging.config.isatty = True

@@ -45,7 +45,7 @@ CC_REPORTER = $(HOME)/bin/cc-test-reporter
 $(CC_REPORTER):
 	curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > $@
 	chmod +x $@
-	$@ before-build
+	$(notdir $@) before-build
 
 .PHONY: travis-setup
 travis-setup: $(CC_REPORTER)
@@ -55,7 +55,7 @@ travis-setup: $(CC_REPORTER)
 
 .PHONY: travis-reports
 travis-reports:
-	ls -l result/
-	cd result && cc-test-reporter after-build
+	cp result/coverage.xml .
+	cc-test-reporter after-build
 
 endif

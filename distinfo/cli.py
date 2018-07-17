@@ -25,19 +25,19 @@ log = logging.getLogger(__name__)
               help="Output formats")
 @click.option("-d", "--depends", is_flag=True, help="Print dependencies")
 @click.version_option(VERSION)
-def main(source_dir, interactive, color, fmt, depends):
+def main(source_dir, **options):
     """
     Extract metadata from Python source distributions
     """
 
-    if color:
+    if options.color:
         cfg.logging.config.isatty = True
     configure_logging()
 
     req = Requirement.from_source(source_dir)
     dist = req.dist
 
-    if interactive:
+    if options.interactive:
         namespace = dict(
             dist=dist,
             req=req,
@@ -53,8 +53,8 @@ def main(source_dir, interactive, color, fmt, depends):
             history_filename=cachedir / "history",
         )
     else:
-        if depends:
+        if options.depends:
             obj = dist.depends
         else:
             obj = dist.metadata
-        util.dump(obj, fmt=fmt)
+        util.dump(obj, fmt=options.fmt)

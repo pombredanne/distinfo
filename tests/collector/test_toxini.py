@@ -16,6 +16,7 @@ deps =
     zzz
     -r requirements.txt
     -r requirements-missing.txt
+    -c xxx
 commands =
     pip install xxx
     python -m pytest

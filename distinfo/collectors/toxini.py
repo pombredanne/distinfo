@@ -58,6 +58,8 @@ class ToxIni(Collector):
                     )
                     continue
                 self.add_requirements_file(reqs_file)
+            elif req.name.startswith("-c"):
+                continue
             else:
                 self.add_requirement(req)
         for key in config.setenv.keys():

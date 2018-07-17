@@ -54,6 +54,7 @@ travis-setup: cc-test-reporter
 
 .PHONY: travis-reports
 travis-reports:
-	./cc-test-reporter after-build --prefix result --coverage-input-type coverage.py
+	ls -l result/
+	./cc-test-reporter after-build --prefix ./result --coverage-input-type coverage.py
 
 endif

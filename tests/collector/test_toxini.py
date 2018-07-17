@@ -1,8 +1,5 @@
-import pytest
-
 from tox.exception import ConfigError
 
-from distinfo import Distribution
 from distinfo.collectors import toxini
 
 from .cases import TestCase

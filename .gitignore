@@ -1,0 +1,13 @@
+*.dist-info/
+*.egg-info/
+*.pyc
+.eggs/
+.nixipy-build.*.nix
+/.cache/
+/.coverage
+/.coverage.*
+/.htmlcov/
+/.no-nix
+/.pytest_cache/
+/result
+__pycache__

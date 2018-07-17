@@ -1,0 +1,38 @@
+strictness: high
+doc-warnings: false
+test-warnings: true
+ignore-paths:
+  # vendored
+  - nixipy/nix.py
+
+mccabe:
+  run: false
+
+pep8:
+  disable:
+    - N806  # variable in function should be lowercase
+
+pep257:
+  disable:
+    - D100
+    - D101
+    - D102
+    - D103
+    - D104
+    - D105
+    - D107
+
+pylint:
+  disable:
+    - eval-used
+    - fixme
+    - inconsistent-return-statements
+    - invalid-name
+    - missing-docstring
+    - no-self-use
+    - redefined-outer-name
+    - too-few-public-methods
+    - too-many-branches
+    - too-many-locals
+    - unsubscriptable-object
+  load-plugins: verboselogs.pylint

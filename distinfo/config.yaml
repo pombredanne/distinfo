@@ -1,0 +1,45 @@
+collectors:
+  - Distutils
+  - Pep518
+  - Pipfile
+  - ToxIni
+  - Nose
+  - Pytest
+  - RequirementsFile
+  - FindTests
+  - PipReqs
+
+# import name => package name
+package_aliases:
+  pkg_resources: setuptools
+
+# logging config
+logging:
+  # passed to coloredlogs.install
+  # see https://coloredlogs.readthedocs.io/en/latest/api.html#coloredlogs.install
+  config:
+    level: debug
+    fmt: "%(name)s %(message)s"
+    level_styles:
+      # YMMV, see `humanfriendly --demo` for options
+      spam:
+        color: yellow
+        bright: true
+      debug:
+        color: cyan
+        bright: true
+      info:
+        color: white
+      warning:
+        color: yellow
+      error:
+        color: red
+        bright: true
+      critical:
+        color: red
+        bold: true
+  # logger levels
+  loggers:
+    parso: info
+    pip._internal: warning
+    pipreqs: warning

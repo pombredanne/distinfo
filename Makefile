@@ -35,10 +35,8 @@ export NIX_CONF
 
 .PHONY: travis-setup
 travis-setup:
-	-mount -o remount,exec,size=4G,mode=755 /run/user
 	mkdir -p /etc/nix
 	echo "$$NIX_CONF" > /etc/nix/nix.conf
-	-launchctl kickstart -k system/org.nixos.nix-daemon
 
 .PHONY: travis-run
 travis-run: PATH := $(HOME)/.local/bin:$(PATH)
@@ -46,4 +44,4 @@ travis-run:
 	nix-env --install --file https://github.com/cachix/cachix/tarball/master
 	nix-build --show-trace
 	cachix push distinfo result
-	cd result && codecov
+	cd result && bin/codecov

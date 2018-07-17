@@ -5,7 +5,7 @@ from .cases import TestCase
 
 SETUP = """
 from setuptools import setup
-setup(name="xxx")
+setup()
 """
 
 PYPROJECT = """

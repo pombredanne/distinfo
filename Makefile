@@ -43,6 +43,7 @@ export NIX_CONF
 
 .PHONY: travis-setup
 travis-setup:
+	sudo mount -o remount,exec,size=4G,mode=755 /run/user
 	-cat /etc/nix/nix.conf
 	sudo mkdir -p /etc/nix
 	echo "$$NIX_CONF" > sudo tee /etc/nix/nix.conf

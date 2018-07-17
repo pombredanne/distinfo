@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/0compute/distinfo.svg?branch=master)](https://travis-ci.org/0compute/distinfo)
 [![Coverage](https://codecov.io/gh/0compute/distinfo/branch/master/graph/badge.svg)](https://codecov.io/gh/0compute/distinfo)
+[![Maintainability](https://api.codeclimate.com/v1/badges/6e4440a1903408842141/maintainability)](https://codeclimate.com/github/0compute/distinfo/maintainability)
 
 `distinfo` is a tool for extracting dependencies and metadata from Python
 source distributions.

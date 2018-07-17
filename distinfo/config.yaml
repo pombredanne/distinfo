@@ -1,4 +1,7 @@
+# metadata collectors, these are run in order
 collectors:
+  # EggInfo must be first as it sets metadata used by the rest
+  - EggInfo
   - Distutils
   - Pep518
   - Pipfile

@@ -17,21 +17,6 @@ log = logging.getLogger(__name__)
 
 class Distribution(Base, pkg_resources.Distribution):
 
-    MULTI_KEYS = (
-        "classifier",
-        "obsoletes",
-        "obsoletes_dist",
-        "platform",
-        "project_url",
-        "provides",
-        "provides_dist",
-        "provides_extra",
-        "requires",
-        "requires_dist",
-        "requires_external",
-        "supported_platform",
-    )
-
     def __init__(self, **kwargs):
         metadata = Munch(
             requires_dist=set(),
@@ -39,31 +24,14 @@ class Distribution(Base, pkg_resources.Distribution):
             extensions=Munch(distinfo=Munch()),
         )
         metadata.update(kwargs)
-        super().__init__(metadata=metadata, project_name=metadata.get("name"))
+        super().__init__(metadata=metadata)
 
     def __str__(self):
         return super().__str__().replace(" ", "-")
 
     @classmethod
     def from_req(cls, req):
-        metadata = dict()
-        with sandbox.pushd(req.source_dir):
-            source_dir = req.source_dir
-            req.source_dir = "."
-            req.run_egg_info()
-            for key, value in req.pkg_info().items():
-                if value == "UNKNOWN":
-                    continue
-                key = key.lower().replace("-", "_")
-                if key == "keywords":
-                    value = sorted(value.split())
-                if key in cls.MULTI_KEYS:
-                    metadata.setdefault(key, set()).add(value)
-                else:
-                    metadata[key] = value
-            req.source_dir = source_dir
-        dist = cls(**metadata)
-        # other requirements
+        dist = cls()
         for name in cfg.collectors:
             getattr(collectors, name)(dist, req.source_dir, req=req).collect()
         return dist

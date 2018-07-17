@@ -1,4 +1,5 @@
 from .distutils import Distutils
+from .egginfo import EggInfo
 from .findtests import FindTests
 from .nose import Nose
 from .pep518 import Pep518

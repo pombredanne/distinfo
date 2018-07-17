@@ -2,6 +2,7 @@ import configparser
 import logging
 from pathlib import Path
 from setuptools import sandbox
+import sys
 
 from pip._internal.req import parse_requirements
 
@@ -25,7 +26,8 @@ class Collector(Base):
         raise NotImplementedError()
 
     def collect(self):
-        with sandbox.pushd(self.source_dir):
+        with sandbox.pushd(self.source_dir), sandbox.save_path():
+            sys.path.insert(0, self.source_dir)
             self._collect()
 
     def add_requirement(self, req, extra="test"):

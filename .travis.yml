@@ -1,2 +1,7 @@
 language: nix
-script: nix-build --show-trace
+jobs:
+  include:
+    - stage: test
+      script: nix-shell --run pytest
+    - stage: coverage
+      script: bash <(curl -s https://codecov.io/bash)

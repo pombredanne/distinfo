@@ -55,6 +55,6 @@ cc-test-reporter:
 travis: cc-test-reporter
 	nix-env --install --file https://github.com/cachix/cachix/tarball/v0.1.0.2
 	$(MAKE) push
-	./cc-test-reporter after-build --prefix result --exit-code $(TRAVIS_TEST_RESULT)
+	./cc-test-reporter after-build --prefix result
 
 endif

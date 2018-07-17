@@ -46,6 +46,6 @@ travis-run:
 	nix-env --install --file https://github.com/cachix/cachix/tarball/master
 	nix-build --show-trace
 	cachix push distinfo result
-	cd result && bin/codecov
+	bash <(curl -s https://codecov.io/bash) -f result/.coverage
 
 endif

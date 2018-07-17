@@ -41,13 +41,14 @@ trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDS
 endef
 export NIX_CONF
 
-cc-test-reporter:
+CC_REPORTER = $(HOME)/bin/cc-test-reporter
+$(CC_REPORTER):
 	curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > $@
 	chmod +x $@
-	./$@ before-build
+	$@ before-build
 
 .PHONY: travis-setup
-travis-setup: cc-test-reporter
+travis-setup: $(CC_REPORTER)
 	sudo mkdir -p /etc/nix
 	echo "$$NIX_CONF" | sudo tee /etc/nix/nix.conf
 	nix-env --install --file https://github.com/cachix/cachix/tarball/v0.1.0.2
@@ -55,6 +56,6 @@ travis-setup: cc-test-reporter
 .PHONY: travis-reports
 travis-reports:
 	ls -l result/
-	./cc-test-reporter after-build --prefix ./result --coverage-input-type coverage.py
+	cd result && cc-test-reporter after-build
 
 endif

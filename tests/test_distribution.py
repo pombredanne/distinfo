@@ -2,7 +2,7 @@ from setuptools import sandbox
 
 import pytest
 
-from distinfo import Distribution, DistInfoException, Requirement
+from distinfo import Distribution, DistInfoException
 
 from .cases import TestCase
 
@@ -10,8 +10,7 @@ from .cases import TestCase
 class TestDistribution(TestCase):
 
     def dist(self, name):
-        dist = Requirement.from_source(self.data_path / name).dist
-        return dist
+        return Distribution.from_source(self.data_path / name)
 
     def test_repr(self):
         dist = Distribution()

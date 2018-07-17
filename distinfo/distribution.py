@@ -1,7 +1,5 @@
 import copy
 import logging
-from setuptools import sandbox
-import sys
 
 import pkg_resources
 
@@ -11,9 +9,9 @@ from pip._internal.exceptions import InstallationError
 
 from property_manager import cached_property
 
-from . import collectors
 from .base import Base
 from .config import cfg
+from .requirement import Requirement
 
 log = logging.getLogger(__name__)
 
@@ -27,13 +25,22 @@ class Distribution(Base, pkg_resources.Distribution):
             extensions=Munch(distinfo=Munch()),
         )
         metadata.update(kwargs)
-        super().__init__(metadata=metadata)
+        super_kw = dict(metadata=metadata)
+        if "name" in metadata:
+            super_kw["project_name"] = metadata.name
+        super().__init__(**super_kw)
 
     def __str__(self):
         return super().__str__().replace(" ", "-")
 
     @classmethod
+    def from_source(cls, source_dir):
+        req = Requirement.from_source(source_dir)
+        return cls.from_req(req)
+
+    @classmethod
     def from_req(cls, req):
+        from . import collectors
         dist = cls()
         for name in cfg.collectors:
             getattr(collectors, name)(dist, req.source_dir, req=req).collect()

@@ -10,8 +10,9 @@ from munch import munchify
 
 from ptpython import repl
 
-from . import Requirement, util
+from . import util
 from .config import cfg, configure_logging
+from .distribution import Distribution
 
 VERSION = pkg_resources.get_distribution("distinfo").version
 
@@ -38,13 +39,11 @@ def main(source_dir, **options):
         cfg.logging.config.isatty = True
     configure_logging()
 
-    req = Requirement.from_source(source_dir)
-    dist = req.dist
+    dist = Distribution.from_source(source_dir)
 
     if options.interactive:
         namespace = dict(
             dist=dist,
-            req=req,
             dump=util.dump,
             dumps=util.dumps,
         )

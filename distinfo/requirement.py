@@ -2,8 +2,6 @@ import logging
 
 from pip._internal.req.req_install import InstallRequirement
 
-from property_manager import lazy_property
-
 from .base import Base
 
 log = logging.getLogger(__name__)
@@ -30,8 +28,3 @@ class Requirement(Base, InstallRequirement):
         req = cls.from_line(str(source_dir))
         req.source_dir = source_dir
         return req
-
-    @lazy_property
-    def dist(self):
-        from .distribution import Distribution
-        return Distribution.from_req(self)

@@ -53,6 +53,8 @@ setup(
     ),
     extras_require=dict(
         dev=(
+            "codecov",
+            "codeclimate-test-reporter",
             "pdbpp",
             # "prospector[with_everything]",
             "pycmd",

@@ -31,12 +31,13 @@ cores = $(shell nproc)
 substituters = https://cache.nixos.org https://cachix.cachix.org https://distinfo.cachix.org
 trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= cachix.cachix.org-1:eWNHQldwUO7G2VkjpnjDbWwy4KQ/HNxht7H4SSoMckM= distinfo.cachix.org-1:nj8IiFYM7vGOYIvh/KZW/DJ7VezbcNep0R4cPNr6lls=
 endef
+export NIX_CONF
 
 .PHONY: travis-setup
 travis-setup:
 	-mount -o remount,exec,size=4G,mode=755 /run/user
 	mkdir -p /etc/nix
-	echo "$(NIX_CONF)" > /etc/nix/nix.conf
+	echo "$$NIX_CONF" > /etc/nix/nix.conf
 	-launchctl kickstart -k system/org.nixos.nix-daemon
 
 .PHONY: travis-run

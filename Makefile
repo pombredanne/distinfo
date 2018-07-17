@@ -20,11 +20,6 @@ lint:
 todo:
 	git grep --line-number "FIXME|HACK|TODO|TOGO"
 
-.PHONY: ci
-ci: test
-	codeclimate-test-reporter
-	codecov
-
 .PHONY: clean
 clean:
 	git clean -fdX

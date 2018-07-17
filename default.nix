@@ -114,38 +114,6 @@ with rec {
     };
   };
 
-  codeclimate-test-reporter = python.pkgs.buildPythonPackage rec {
-    pname = "codeclimate-test-reporter";
-    version = "0.2.3";
-    src = python.pkgs.fetchPypi {
-      inherit pname version;
-      sha256 = "d4a5962323e0ebf7d0e9959bcb605910dbb937ff93b21035421b7967dc242865";
-    };
-    propagatedBuildInputs = [ coverage requests ];
-    doCheck = false;
-    meta = {
-      description = "Report test coverage to Code Climate";
-      homepage = http://github.com/codeclimate/python-test-reporter;
-      license = lib.licenses.mit;
-    };
-  };
-
-  codecov = python.pkgs.buildPythonPackage rec {
-    pname = "codecov";
-    version = "2.0.15";
-    src = python.pkgs.fetchPypi {
-      inherit pname version;
-      sha256 = "8ed8b7c6791010d359baed66f84f061bba5bd41174bf324c31311e8737602788";
-    };
-    propagatedBuildInputs = [ coverage requests ];
-    doCheck = false;
-    meta = {
-      description = "Hosted coverage reports for Github, Bitbucket and Gitlab";
-      homepage = http://github.com/codecov/codecov-python;
-      license = "http://www.apache.org/licenses/LICENSE-2.0";
-    };
-  };
-
   coloredlogs = python.pkgs.buildPythonPackage rec {
     pname = "coloredlogs";
     version = "10.0";
@@ -951,8 +919,6 @@ python.pkgs.buildPythonPackage rec {
   propagatedBuildInputs = [
     appdirs
     click
-    codeclimate-test-reporter
-    codecov
     coloredlogs
     munch
     pdbpp

@@ -975,7 +975,7 @@ with rec {
 };
 python.pkgs.buildPythonPackage rec {
   pname = "distinfo";
-  version = "0.0.0";
+  version = "0.1.0";
   src = nix-gitignore.gitignoreSource ./.;
   buildInputs = [ pkgs.glibcLocales pytest-runner ];
   propagatedBuildInputs = [

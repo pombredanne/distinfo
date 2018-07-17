@@ -4,8 +4,8 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/6e4440a1903408842141/test_coverage)](https://codeclimate.com/github/0compute/distinfo/test_coverage)
 [![Maintainability](https://api.codeclimate.com/v1/badges/6e4440a1903408842141/maintainability)](https://codeclimate.com/github/0compute/distinfo/maintainability)
 
-`distinfo` is a tool for extracting dependencies and metadata from Python
-source distributions.
+`distinfo` is a tool for extracting metadata, including full dependencies, from
+Python source distributions.
 
 ## Usage
 
@@ -21,7 +21,7 @@ Print dependencies and metadata:
 
 ``` python
 >>> from distinfo import Requirement, dump
->>> 
+>>>
 >>> req = Requirement.from_source(".")
 >>> dump(req.dist.depends)
 {

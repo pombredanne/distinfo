@@ -44,5 +44,6 @@ travis-setup:
 travis-run: PATH := $(HOME)/.local/bin:$(PATH)
 travis-run:
 	nix-env --install --file https://github.com/cachix/cachix/tarball/master
-	cachix push distinfo --watch-store &
-	nix-shell --run "pytest && codecov"
+	nix-build --show-trace
+	cachix push distinfo result
+	cd result && codecov

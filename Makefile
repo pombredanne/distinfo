@@ -30,6 +30,8 @@ ifdef TRAVIS
 
 define NIX_CONF
 cores = $(shell nproc)
+max-jobs = $(shell nproc)
+sandbox = true
 substituters = https://cache.nixos.org https://cachix.cachix.org https://distinfo.cachix.org
 trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= cachix.cachix.org-1:eWNHQldwUO7G2VkjpnjDbWwy4KQ/HNxht7H4SSoMckM= distinfo.cachix.org-1:nj8IiFYM7vGOYIvh/KZW/DJ7VezbcNep0R4cPNr6lls=
 endef
@@ -39,7 +41,7 @@ export NIX_CONF
 travis-setup:
 	sudo mount -o remount,exec,size=4G,mode=755 /run/user
 	sudo mkdir -p /etc/nix
-	echo "$$NIX_CONF" > sudo tee -a /etc/nix/nix.conf
+	echo "$$NIX_CONF" > sudo tee /etc/nix/nix.conf
 
 cc-test-reporter:
 	curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > $@

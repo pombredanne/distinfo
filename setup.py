@@ -53,6 +53,7 @@ setup(
     ),
     extras_require=dict(
         dev=(
+            "codecov",
             "pdbpp",
             # "prospector[with_everything]",
             "pycmd",

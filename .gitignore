@@ -6,6 +6,7 @@
 /.cache/
 /.coverage
 /.coverage.*
+/.env
 /.htmlcov/
 /.no-nix
 /.pytest_cache/

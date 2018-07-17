@@ -47,7 +47,7 @@ cc-test-reporter:
 
 .PHONY: travis
 travis: cc-test-reporter
-	nix-env --install --file https://github.com/cachix/cachix/tarball/master
+	nix-env --install --file https://github.com/cachix/cachix/tarball/v0.1.0.2
 	nix-build --show-trace
 	cachix push distinfo result
 	./cc-test-reporter after-build --exit-code $(TRAVIS_TEST_RESULT) --prefix result

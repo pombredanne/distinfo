@@ -395,6 +395,21 @@ with rec {
     };
   };
 
+  pkginfo = python.pkgs.buildPythonPackage rec {
+    pname = "pkginfo";
+    version = "1.4.2";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "5878d542a4b3f237e359926384f1dde4e099c9f5525d236b1840cf704fa8d474";
+    };
+    doCheck = false;
+    meta = {
+      description = "Query metadatdata from sdists / bdists / installed packages.";
+      homepage = https://code.launchpad.net/~tseaver/pkginfo/trunk;
+      license = lib.licenses.mit;
+    };
+  };
+
   pluggy = python.pkgs.buildPythonPackage rec {
     pname = "pluggy";
     version = "0.6.0";
@@ -638,6 +653,22 @@ with rec {
     };
   };
 
+  requests-toolbelt = python.pkgs.buildPythonPackage rec {
+    pname = "requests-toolbelt";
+    version = "0.8.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "f6a531936c6fa4c6cfce1b9c10d5c4f498d16528d2a54a22ca00011205a187b5";
+    };
+    propagatedBuildInputs = [ requests ];
+    doCheck = false;
+    meta = {
+      description = "A utility belt for advanced users of python-requests";
+      homepage = https://toolbelt.readthedocs.org;
+      license = lib.licenses.asl20;
+    };
+  };
+
   requirements-parser = python.pkgs.buildPythonPackage rec {
     pname = "requirements-parser";
     version = "0.2.0";
@@ -805,6 +836,37 @@ with rec {
     };
   };
 
+  tqdm = python.pkgs.buildPythonPackage rec {
+    pname = "tqdm";
+    version = "4.23.4";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "77b8424d41b31e68f437c6dd9cd567aebc9a860507cb42fbd880a5f822d966fe";
+    };
+    doCheck = false;
+    meta = {
+      description = "Fast, Extensible Progress Meter";
+      homepage = https://github.com/tqdm/tqdm;
+      license = "MPLv2.0, MIT Licences";
+    };
+  };
+
+  twine = python.pkgs.buildPythonPackage rec {
+    pname = "twine";
+    version = "1.11.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "2fd9a4d9ff0bcacf41fdc40c8cb0cfaef1f1859457c9653fd1b92237cc4e9f25";
+    };
+    propagatedBuildInputs = [ pkginfo requests-toolbelt setuptools tqdm ];
+    doCheck = false;
+    meta = {
+      description = "Collection of utilities for publishing packages on PyPI";
+      homepage = https://twine.readthedocs.io/;
+      license = "Apache License, Version 2.0";
+    };
+  };
+
   urllib3 = python.pkgs.buildPythonPackage rec {
     pname = "urllib3";
     version = "1.23";
@@ -932,6 +994,7 @@ python.pkgs.buildPythonPackage rec {
     PyYAML
     requirementslib
     tox
+    twine
     wrapt
   ];
   LANG = "en_US.UTF-8";

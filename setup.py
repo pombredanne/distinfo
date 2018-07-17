@@ -58,6 +58,7 @@ setup(
             "pycmd",
             "pytest-cov",
             "pytest-sugar",
+            "twine",
         ),
     ),
 )

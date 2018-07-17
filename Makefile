@@ -30,6 +30,11 @@ todo:
 clean:
 	git clean -fdX
 
+.PHONY: upload
+upload:
+	python setup.py sdist
+	twine upload dist/*
+
 ifdef TRAVIS
 
 define NIX_CONF

@@ -30,7 +30,6 @@ class PipReqs(Collector):
             pkg_imports = imports.setdefault(package, set())
             pkg_imports |= self._get_packages(package)
             toplevel_imports -= pkg_imports
-            log.debug("%r %s: %r", self, package, pkg_imports)
 
         # remove self references
         for pkg_imports in imports.values():

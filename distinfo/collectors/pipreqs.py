@@ -14,10 +14,14 @@ log = logging.getLogger(__name__)
 class PipReqs(Collector):
 
     def _get_packages(self, path):
-        return set(map(
-            str.lower,
-            pipreqs.get_pkg_names(pipreqs.get_all_imports(path)),
-        ))
+        try:
+            return set(map(
+                str.lower,
+                pipreqs.get_pkg_names(pipreqs.get_all_imports(path)),
+            ))
+        except Exception as exc:
+            log.exception("%r failed to get packages", self)
+            return set()
 
     def _collect(self):
 

@@ -1,3 +1,4 @@
+import pathlib
 from setuptools import setup, find_packages
 
 
@@ -7,6 +8,8 @@ setup(
     author="Arthur Noel",
     author_email="arthur@0compute.net",
     description="Extract metadata from Python source distributions",
+    long_description=open(pathlib.Path(__file__).parent / "README.md").read(),
+    long_description_content_type="text/markdown",
     keywords=("packaging"),
     license="GPL-3.0-or-later",
     classifiers=[

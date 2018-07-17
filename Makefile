@@ -39,13 +39,14 @@ export NIX_CONF
 travis-setup:
 	sudo mkdir -p /etc/nix
 	echo "$$NIX_CONF" > sudo tee -a /etc/nix/nix.conf
-	curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-	chmod +x ./cc-test-reporter
-	./cc-test-reporter before-build
 
-.PHONY: travis-run
-travis-run: PATH := $(HOME)/.local/bin:$(PATH)
-travis-run:
+cc-test-reporter:
+	curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > $@
+	chmod +x $@
+	./$@ before-build
+
+.PHONY: travis
+travis: cc-test-reporter
 	nix-env --install --file https://github.com/cachix/cachix/tarball/master
 	nix-build --show-trace
 	cachix push distinfo result

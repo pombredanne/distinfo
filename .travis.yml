@@ -1,2 +1,2 @@
 language: nix
-script: nix-shell --run pytest && bash <(curl -s https://codecov.io/bash)
+script: nix-shell --run pytest && pip install --user codecov && codecov

@@ -10,5 +10,6 @@
 /.htmlcov/
 /.no-nix
 /.pytest_cache/
+/coverage.xml
 /result
 __pycache__

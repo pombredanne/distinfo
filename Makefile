@@ -37,8 +37,11 @@ export NIX_CONF
 
 .PHONY: travis-setup
 travis-setup:
-	mkdir -p /etc/nix
-	echo "$$NIX_CONF" > /etc/nix/nix.conf
+	sudo mkdir -p /etc/nix
+	echo "$$NIX_CONF" > sudo tee -a /etc/nix/nix.conf
+	curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+	chmod +x ./cc-test-reporter
+	./cc-test-reporter before-build
 
 .PHONY: travis-run
 travis-run: PATH := $(HOME)/.local/bin:$(PATH)
@@ -46,6 +49,6 @@ travis-run:
 	nix-env --install --file https://github.com/cachix/cachix/tarball/master
 	nix-build --show-trace
 	cachix push distinfo result
-	bash <(curl -s https://codecov.io/bash) -f result/.coverage
+	./cc-test-reporter after-build --exit-code $(TRAVIS_TEST_RESULT) --prefix result
 
 endif

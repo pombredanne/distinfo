@@ -935,7 +935,7 @@ python.pkgs.buildPythonPackage rec {
     wrapt
   ];
   LANG = "en_US.UTF-8";
-  checkPhase = "HOME=$NIX_BUILD_TOP pytest && cp .coverage $out";
+  checkPhase = "HOME=$NIX_BUILD_TOP pytest && cp coverage.xml $out";
   meta = {
     description = "Extract metadata from Python source distributions";
     license = "GPL-3.0-or-later";

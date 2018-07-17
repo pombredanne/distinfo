@@ -2,7 +2,7 @@ import logging
 import os
 from pathlib import Path
 import sys
-import subprocess
+from subprocess import list2cmdline
 
 from munch import munchify
 
@@ -37,13 +37,13 @@ class ToxIni(Collector):
 
         for command in config.commands:
             if command[0:2] == ["pip", "install"]:
-                req = Requirement.from_line(subprocess.list2cmdline(command[2:]))
+                req = Requirement.from_line(list2cmdline(command[2:]))
                 self.add_requirement(req)
             else:
                 cmd = []
                 for expr in command:
                     cmd.append(expr.replace(os.getcwd(), "."))
-                cmd = subprocess.list2cmdline(cmd).strip()
+                cmd = list2cmdline(cmd).strip()
                 if cmd.startswith("-"):
                     cmd = "%s || true" % cmd[1:].strip()
                 commands.append(cmd)

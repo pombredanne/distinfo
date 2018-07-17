@@ -14,7 +14,10 @@ log = logging.getLogger(__name__)
 class PipReqs(Collector):
 
     def _get_packages(self, path):
-        return set(map(str.lower, pipreqs.get_pkg_names(pipreqs.get_all_imports(path))))
+        return set(map(
+            str.lower,
+            pipreqs.get_pkg_names(pipreqs.get_all_imports(path)),
+        ))
 
     def _collect(self):
 
@@ -45,7 +48,7 @@ class PipReqs(Collector):
                         and pkg.replace("_", "-") not in run:
                     missing.append(pkg)
             if missing:
-                log.warning("%s missing runtime dependencies: %r", self, missing)
+                log.warning("%s missing run dependencies: %r", self, missing)
         if toplevel_imports:
             imports["build"] = toplevel_imports
         if imports:

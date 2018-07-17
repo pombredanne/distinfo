@@ -26,6 +26,8 @@ clean:
 
 endif
 
+ifdef TRAVIS
+
 define NIX_CONF
 cores = $(shell nproc)
 substituters = https://cache.nixos.org https://cachix.cachix.org https://distinfo.cachix.org
@@ -45,3 +47,5 @@ travis-run:
 	nix-build --show-trace
 	cachix push distinfo result
 	cd result && bin/codecov
+
+endif

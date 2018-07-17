@@ -43,11 +43,8 @@ export NIX_CONF
 
 .PHONY: travis-setup
 travis-setup:
-	sudo mount -o remount,exec,size=4G,mode=755 /run/user
-	-cat /etc/nix/nix.conf
 	sudo mkdir -p /etc/nix
 	echo "$$NIX_CONF" | sudo tee /etc/nix/nix.conf
-	-cat /etc/nix/nix.conf
 
 cc-test-reporter:
 	curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > $@
@@ -58,6 +55,6 @@ cc-test-reporter:
 travis: cc-test-reporter
 	nix-env --install --file https://github.com/cachix/cachix/tarball/v0.1.0.2
 	$(MAKE) push
-	./cc-test-reporter after-build --exit-code $(TRAVIS_TEST_RESULT) --prefix result
+	./cc-test-reporter after-build --prefix result --exit-code $(TRAVIS_TEST_RESULT)
 
 endif

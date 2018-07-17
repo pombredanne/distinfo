@@ -23,6 +23,12 @@ class TestDistribution(TestCase):
         assert {"xxx"} == dist.requires_dist
         assert {"xxx"} == dist.depends.run
 
+    def test_bad_requirement(self):
+        dist = Distribution()
+        dist.add_requirement("xxx")
+        dist.add_requirement("-cxxx")
+        assert {"xxx"} == dist.reqs
+
     def test_dep_map(self):
         dist = Distribution(requires_dist=["xxx"])
         assert {"xxx"} == dist._dep_map[None]  # pylint: disable=protected-access

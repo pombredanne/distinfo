@@ -1,10 +1,13 @@
 import copy
 import logging
 from setuptools import sandbox
+import sys
 
 import pkg_resources
 
 from munch import Munch
+
+from pip._internal.exceptions import InstallationError
 
 from property_manager import cached_property
 
@@ -55,7 +58,13 @@ class Distribution(Base, pkg_resources.Distribution):
     @cached_property
     def reqs(self):
         from .requirement import Requirement
-        return set(map(Requirement.from_req, self.requires_dist))
+        reqs = set()
+        for req in self.requires_dist:
+            try:
+                reqs.add(Requirement.from_req(req))
+            except InstallationError as exc:
+                log.warning("%r requirement %r fail: %r", self, req, exc)
+        return reqs
 
     @cached_property
     def depends(self):

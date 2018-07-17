@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="distinfo",
-    version="0.0.0",
+    version="0.1.0",
     author="Arthur Noel",
     author_email="arthur@0compute.net",
     description="Extract metadata from Python source distributions",

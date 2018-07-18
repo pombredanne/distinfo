@@ -50,3 +50,6 @@ class Distutils(Collector):
         for extra, reqs in requires.items():
             for req in reqs:
                 self.add_requirement(req, extra=extra)
+        if dist.packages is not None:
+            self.dist.ext.packages = list(filter(lambda p: p.find(".") == -1,
+                                                 dist.packages))

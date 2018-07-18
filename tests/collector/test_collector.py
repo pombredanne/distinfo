@@ -3,11 +3,14 @@ from setuptools import sandbox
 from distinfo.distribution import Distribution
 from distinfo.collectors.collector import Collector, PackageCollector
 
+from munch import Munch
+
 from ..cases import TestCase
 
 
 class XCollector(PackageCollector):
-    name = "xxx"
+
+    name = "testpkg"
 
 
 class TestPytest(TestCase):
@@ -24,6 +27,15 @@ class TestPytest(TestCase):
 
     def test_package_collector(self, tmpdir):
         dist = Distribution(name="xxx")
+        dist.ext.imports = Munch(xxx={XCollector.name})
+        dist.ext.packages = ["xxx"]
+        collector = XCollector(dist, tmpdir)  # pylint: disable=not-callable
+        collector.collect()
+        print(dist.depends)
+        assert {XCollector.name} == dist.depends.run
+
+    def test_package_collector_self(self, tmpdir):
+        dist = Distribution(name=XCollector.name)
         collector = XCollector(dist, tmpdir)  # pylint: disable=not-callable
         collector.collect()
         assert not dist.depends

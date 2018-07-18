@@ -55,9 +55,26 @@ class PackageCollector(Collector):
 
     name = None
 
+    def _requires(self):
+        raise NotImplementedError()
+
     def _collect(self):
         if getattr(self.dist, "name", None) == self.name:
             return
-        req = self._requires()
+        # check imports for the package name
+        req = False
+        extra = "test"
+        imports = getattr(self.dist.ext, "imports", None)
+        log.debug(imports)
+        if imports is not None:
+            for package in getattr(self.dist.ext, "packages", []):
+                if self.name in getattr(imports, package, []):
+                    req = self.name
+                    if package == self.dist.name:
+                        extra = "run"
+                    break
+        # if not found here then hand off to subclass
+        if not req:
+            req = self._requires()
         if req:
-            self.add_requirement(req)
+            self.add_requirement(req, extra=extra)

@@ -22,6 +22,7 @@ log = logging.getLogger(__name__)
 @click.command()
 @click.argument("source_dir", nargs=1, default=".",
                 type=click.Path(exists=True, file_okay=False))
+@click.option("-o", "--output", help="Output file")
 @click.option("-i", "--interactive", is_flag=True)
 @click.option("-c", "--color", is_flag=True, help="Force colored output")
 @click.option("-f", "--fmt", type=click.Choice(util.DUMPERS.keys()),
@@ -57,7 +58,12 @@ def main(source_dir, **options):
         )
     else:
         if options.depends:
-            obj = dist.depends
+            obj = dist.requires
         else:
-            obj = dist.metadata
-        util.dump(obj, fmt=options.fmt)
+            obj = dist
+        dump = util.dumps(obj, fmt=options.fmt)
+        if options.output:
+            with open(options.output, "w") as stream:
+                stream.write(dump)
+        else:
+            print(dump)

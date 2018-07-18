@@ -25,7 +25,7 @@ class PipReqs(Collector):
                 )
             )
         except Exception as exc:
-            log.exception("%r fail", self)
+            log.exception("%r fail: %r", self, exc)
             return set()
 
     def _collect(self):

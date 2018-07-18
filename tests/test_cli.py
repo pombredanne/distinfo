@@ -1,4 +1,4 @@
-# import json
+import json
 
 from click.testing import CliRunner
 
@@ -20,10 +20,19 @@ class TestCli(TestCase):
     def test_main_extract(self):
         result = self._invoke(cli.main, ["-c", str(self.data_path / "test.dist")])
         print(result.output)
-        # FIXME: log output gets written to stdout
+        # FIXME: logging writes to stdout
         # dist = json.loads(result.output)
         # assert dist["name"] == "test.dist"
         assert "test.dist" in result.output
+
+    def test_main_extract_write(self, tmpdir):
+        out = tmpdir.join("out.json")
+        self._invoke(
+            cli.main,
+            ["-o", str(out), str(self.data_path / "test.dist")],
+        )
+        dist = json.load(open(out))
+        assert dist["name"] == "test.dist"
 
     def test_main_depends(self):
         result = self._invoke(cli.main, ["-d", str(self.data_path / "test.dist")])

@@ -30,7 +30,5 @@ def dumps(obj, fmt=None, **kwargs):
     return DUMPERS[fmt](_todict(obj), **kwargs)
 
 
-def dump(obj, file=None, **kwargs):
-    if file is None:
-        file = sys.stdout
+def dump(obj, file=sys.stdout, **kwargs):
     print(dumps(obj, **kwargs), file=file)

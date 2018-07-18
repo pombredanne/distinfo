@@ -45,8 +45,8 @@ class Distutils(Collector):
             {k: set(v) for k, v in getattr(dist, "extras_require", {}).items()}
         )
         for attr, extra in self.EXTRAS.items():
-            reqs = getattr(dist, attr, None)
-            requires[extra] |= set(reqs or [])
+            reqs = getattr(dist, attr, None) or []
+            requires[extra] |= set(reqs)
         for extra, reqs in requires.items():
             for req in reqs:
                 self.add_requirement(req, extra=extra)

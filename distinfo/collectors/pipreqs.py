@@ -1,7 +1,7 @@
 import logging
 from setuptools import find_packages
 
-from munch import Munch
+from munch import DefaultFactoryMunch
 
 from pipreqs import pipreqs
 
@@ -25,15 +25,14 @@ class PipReqs(Collector):
 
     def _collect(self):
 
-        imports = Munch()
+        imports = DefaultFactoryMunch(set)
         toplevel_imports = self._get_packages(".")
         packages = list(filter(lambda p: p.find(".") == -1, find_packages()))
 
         # check each package
         for package in packages:
-            pkg_imports = imports.setdefault(package, set())
-            pkg_imports |= self._get_packages(package)
-            toplevel_imports -= pkg_imports
+            imports[package] |= self._get_packages(package)
+            toplevel_imports -= imports[package]
 
         # remove self references
         for pkg_imports in imports.values():
@@ -44,7 +43,7 @@ class PipReqs(Collector):
         # check dist package
         distpkg = imports.get(self.dist.name)
         if distpkg is not None:
-            run = getattr(self.dist.depends, "run", [])
+            run = self.dist.depends.run
             missing = []
             for pkg in distpkg:
                 if cfg.package_aliases.get(pkg, pkg) not in run \

@@ -21,6 +21,7 @@ class TestDistribution(TestCase):
         dist.add_requirement("xxx")
         assert {"xxx"} == dist.requires_dist
         assert {"xxx"} == dist.depends.run
+        assert not dist.depends.test
 
     def test_bad_requirement(self):
         dist = Distribution()

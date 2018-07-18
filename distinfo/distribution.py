@@ -3,6 +3,7 @@ import logging
 from munch import Munch
 
 from pip._vendor.packaging.markers import Marker
+from pip._vendor.packaging.requirements import InvalidRequirement
 
 from property_manager import cached_property
 
@@ -48,21 +49,6 @@ class Distribution(Base, wrapt.ObjectProxy):
     def ext(self):
         return self.extensions.distinfo
 
-    def add_requirement(self, req, extra="run"):
-        if isinstance(req, str):
-            req = registry.Requirement(req)
-        if extra != "run":
-            self.provides_extra.add(extra)
-            assert req.marker is None, "%r has marker" % req
-            marker = extra
-            if marker.startswith(":"):
-                marker = marker[1:]
-            else:
-                marker = "extra == '%s'" % extra
-            req.marker = Marker(marker)
-        self.requires_dist.add(str(req))
-        del self.requires
-
     def _filter_reqs(self, reqs, extra=None):
         filtered = set()
         env = dict(extra=extra)
@@ -78,17 +64,45 @@ class Distribution(Base, wrapt.ObjectProxy):
     @cached_property
     def requires(self):
         from . import registry
-        reqs = set(map(registry.Requirement, self.requires_dist))
+        reqs = set()
+        for req in self.requires_dist:
+            try:
+                req = registry.Requirement(req)
+            except InvalidRequirement as exc:
+                log.warning("%r requirement %r raised: %r", self, req, exc)
+            else:
+                reqs.add(req)
         requires = Munch()
         run = self._filter_reqs(reqs)
         if run:
             requires["run"] = run
             reqs -= run
         for extra in self.provides_extra:
-            requires[extra] = set(map(
+            filtered = set(map(
                 # take the marker off the requirement
                 lambda r: setattr(r, "marker", None) or r,
                 # pylint: disable=cell-var-from-loop
                 self._filter_reqs(reqs, extra=extra),
             ))
+            if filtered:
+                requires[extra] = filtered
         return requires
+
+    def add_requirement(self, req, extra="run"):
+        if isinstance(req, str):
+            try:
+                req = registry.Requirement(req)
+            except InvalidRequirement as exc:
+                log.warning("%r %r add %r raised %r", self, extra, req, exc)
+                return
+        if extra != "run":
+            self.provides_extra.add(extra)
+            assert req.marker is None, "%r has marker" % req
+            marker = extra
+            if marker.startswith(":"):
+                marker = marker[1:]
+            else:
+                marker = "extra == '%s'" % extra
+            req.marker = Marker(marker)
+        self.requires_dist.add(str(req))
+        del self.requires

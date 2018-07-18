@@ -27,9 +27,11 @@ class TestDistribution(TestCase):
         dist.add_requirement("yyy", extra=":python_version > '1'")
         assert len(dist.requires.run) == 2
 
-    def test_bad_requirement(self):
+    def test_bad_requirement(self, caplog):
         dist = Distribution()
-        pytest.raises(InvalidRequirement, dist.add_requirement, "-cxxx")
+        dist.add_requirement("-cxxx")
+        assert len(caplog.records) == 1
+        assert "InvalidRequirement" in caplog.text
 
     def test_bad_setup(self, monkeypatch):
         # pylint: disable=protected-access
@@ -41,3 +43,9 @@ class TestDistribution(TestCase):
                             "_execfile",
                             self._make_raiser(BaseException, function=original))
         self.dist(name)
+
+    def test_requires(self, caplog):
+        dist = Distribution(requires_dist=["xxx", "asdasd; d"])
+        assert {"xxx"} == dist.requires.run
+        assert len(caplog.records) == 1
+        assert "InvalidRequirement" in caplog.text

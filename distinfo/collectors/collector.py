@@ -4,8 +4,6 @@ from pathlib import Path
 import sys
 
 from pip._internal.req import parse_requirements
-from pip._vendor.packaging.markers import InvalidMarker
-from pip._vendor.packaging.requirements import InvalidRequirement
 
 from setuptools import sandbox
 
@@ -35,10 +33,7 @@ class Collector(Base):
 
     def add_requirement(self, req, extra="test"):
         log.debug("%r %r add %r", self, extra, req)
-        try:
-            self.dist.add_requirement(req, extra=extra)
-        except (InvalidMarker, InvalidRequirement) as exc:
-            log.warning("%r %r add %r raised %r", self, extra, req, exc)
+        self.dist.add_requirement(req, extra=extra)
 
     def add_requirements_file(self, path):
         if path in self._seen_files:

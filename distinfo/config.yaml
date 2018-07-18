@@ -1,4 +1,4 @@
-# metadata collectors, these are run in order
+# metadata collectors, order is important as latter depend on former
 collectors:
   # EggInfo must be first as it sets metadata used by the rest
   - EggInfo

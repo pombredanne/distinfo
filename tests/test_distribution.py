@@ -24,6 +24,8 @@ class TestDistribution(TestCase):
         dist.add_requirement("xxx")
         assert {"xxx"} == dist.requires_dist
         assert {"xxx"} == dist.requires.run
+        dist.add_requirement("yyy", extra=":python_version > '1'")
+        assert len(dist.requires.run) == 2
 
     def test_bad_requirement(self):
         dist = Distribution()

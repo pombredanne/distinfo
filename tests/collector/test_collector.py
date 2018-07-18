@@ -1,6 +1,6 @@
-from setuptools import sandbox
-
 from munch import Munch
+
+from setuptools import sandbox
 
 from distinfo.distribution import Distribution
 from distinfo.collectors.collector import Collector, PackageCollector

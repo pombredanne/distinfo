@@ -61,10 +61,7 @@ class ToxIni(Collector):
                     continue
                 self.add_requirements_file(reqs_file)
             else:
-                try:
-                    self.add_requirement(str(dep))
-                except InvalidRequirement as exc:
-                    log.warning("%r %r raised %r", self, dep, exc)
+                self.add_requirement(str(dep))
         for key in config.setenv.keys():
             if key in ("PYTHONHASHSEED", "PYTHONPATH"):
                 continue

@@ -4,10 +4,11 @@ from pathlib import Path
 import sys
 
 from pip._internal.req import parse_requirements
+from pip._vendor.packaging.markers import InvalidMarker
+from pip._vendor.packaging.requirements import InvalidRequirement
 
 from setuptools import sandbox
 
-from .. import registry
 from ..base import Base
 
 log = logging.getLogger(__name__)
@@ -33,8 +34,11 @@ class Collector(Base):
             self._collect()
 
     def add_requirement(self, req, extra="test"):
-        log.debug("%r %s add %r", self, extra, req)
-        self.dist.add_requirement(req, extra=extra)
+        log.debug("%r %r add %r", self, extra, req)
+        try:
+            self.dist.add_requirement(req, extra=extra)
+        except (InvalidMarker, InvalidRequirement) as exc:
+            log.warning("%r %r add %r raised %r", self, extra, req, exc)
 
     def add_requirements_file(self, path):
         if path in self._seen_files:
@@ -66,7 +70,6 @@ class PackageCollector(Collector):
         req = False
         extra = "test"
         imports = getattr(self.dist.ext, "imports", None)
-        log.debug(imports)
         if imports is not None:
             for package in getattr(self.dist.ext, "packages", []):
                 if self.name in getattr(imports, package, []):

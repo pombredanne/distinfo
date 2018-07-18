@@ -1,10 +1,8 @@
-import copy
 import logging
 
 from munch import Munch
 
 from pip._vendor.packaging.markers import Marker
-from pip._vendor.packaging.requirements import InvalidRequirement
 
 from property_manager import cached_property
 
@@ -55,16 +53,32 @@ class Distribution(Base, wrapt.ObjectProxy):
         if extra != "run":
             self.provides_extra.add(extra)
             assert req.marker is None, "%r has marker" % req
-            req.marker = Marker("extra == '%s'" % extra)
+            marker = extra
+            if marker.startswith(":"):
+                marker = marker[1:]
+            else:
+                marker = "extra == '%s'" % extra
+            req.marker = Marker(marker)
         self.requires_dist.add(str(req))
         del self.requires
+
+    def _filter_reqs(self, reqs, extra=None):
+        filtered = set()
+        for req in reqs:
+            if extra is None:
+                if req.marker is None or req.marker.evaluate(dict(extra=extra)):
+                    filtered.add(req)
+            else:
+                if req.marker is not None and req.marker.evaluate(dict(extra=extra)):
+                    filtered.add(req)
+        return filtered
 
     @cached_property
     def requires(self):
         from . import registry
         reqs = set(map(registry.Requirement, self.requires_dist))
         requires = Munch()
-        run = set(filter(lambda r: r.marker is None, reqs))
+        run = self._filter_reqs(reqs)
         if run:
             requires["run"] = run
             reqs -= run
@@ -73,7 +87,6 @@ class Distribution(Base, wrapt.ObjectProxy):
                 # take the marker off the requirement
                 lambda r: setattr(r, "marker", None) or r,
                 # pylint: disable=cell-var-from-loop
-                filter(lambda r: r.marker is not None
-                       and r.marker.evaluate(dict(extra=extra)), reqs)
+                self._filter_reqs(reqs, extra=extra),
             ))
         return requires

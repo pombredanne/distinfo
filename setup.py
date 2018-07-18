@@ -7,6 +7,7 @@ setup(
     version="0.1.0",
     author="Arthur Noel",
     author_email="arthur@0compute.net",
+    url="https://github.com/0compute/distinfo",
     description="Extract metadata from Python source distributions",
     long_description=open(pathlib.Path(__file__).parent / "README.md").read(),
     long_description_content_type="text/markdown",

@@ -3,7 +3,8 @@ import logging
 
 from munch import Munch
 
-from pip._internal.exceptions import InstallationError
+from pip._vendor.packaging.markers import Marker
+from pip._vendor.packaging.requirements import InvalidRequirement
 
 from property_manager import cached_property
 
@@ -12,6 +13,7 @@ import wrapt
 from . import registry
 from .base import Base
 from .config import cfg
+from .requirement import parse_requirement
 
 log = logging.getLogger(__name__)
 
@@ -41,45 +43,37 @@ class Distribution(Base, wrapt.ObjectProxy):
 
     @classmethod
     def from_source(cls, source_dir):
-        req = registry.Requirement.from_source(source_dir)
-        return cls(req=req)
+        return cls(req=parse_requirement(source_dir))
 
     @property
     def ext(self):
         return self.extensions.distinfo
 
     def add_requirement(self, req, extra="run"):
+        if isinstance(req, str):
+            req = registry.Requirement(req)
         if extra != "run":
             self.provides_extra.add(extra)
-            req = "%s; extra == '%s'" % (req, extra)
-        self.requires_dist.add(req)
-        del self.reqs
+            assert req.marker is None, "%r has marker" % req
+            req.marker = Marker("extra == '%s'" % extra)
+        self.requires_dist.add(str(req))
         del self.requires
 
     @cached_property
-    def reqs(self):
-        from . import registry
-        reqs = set()
-        for req in self.requires_dist:
-            try:
-                reqs.add(registry.Requirement.from_req(req))
-            except InstallationError as exc:
-                log.warning("%r requirement %r fail: %r", self, req, exc)
-        return reqs
-
-    @cached_property
     def requires(self):
-        reqs = set(map(copy.deepcopy, self.reqs))
+        from . import registry
+        reqs = set(map(registry.Requirement, self.requires_dist))
         requires = Munch()
-        run = set(filter(lambda r: r.markers is None, self.reqs))
+        run = set(filter(lambda r: r.marker is None, reqs))
         if run:
             requires["run"] = run
             reqs -= run
         for extra in self.provides_extra:
             requires[extra] = set(map(
                 # take the marker off the requirement
-                lambda r: setattr(r.req, "marker", None) or r,
+                lambda r: setattr(r, "marker", None) or r,
                 # pylint: disable=cell-var-from-loop
-                filter(lambda r: r.markers.evaluate(dict(extra=extra)), reqs)
+                filter(lambda r: r.marker is not None
+                       and r.marker.evaluate(dict(extra=extra)), reqs)
             ))
         return requires

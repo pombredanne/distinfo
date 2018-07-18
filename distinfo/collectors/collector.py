@@ -7,6 +7,7 @@ from pip._internal.req import parse_requirements
 
 from setuptools import sandbox
 
+from .. import registry
 from ..base import Base
 
 log = logging.getLogger(__name__)

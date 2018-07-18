@@ -1,5 +1,5 @@
 from distinfo.collectors import Pep518
-from distinfo.requirement import Requirement
+from distinfo.requirement import parse_requirement
 
 from .cases import TestCase
 
@@ -21,5 +21,5 @@ class TestPep518(TestCase):
     def test_collect(self, tmpdir):
         tmpdir.join("setup.py").write(SETUP)
         tmpdir.join("pyproject.toml").write(PYPROJECT)
-        dist = self._collect(tmpdir, req=Requirement.from_source(tmpdir))
+        dist = self._collect(tmpdir, req=parse_requirement(tmpdir))
         assert {"zzz"} == dist.requires.build

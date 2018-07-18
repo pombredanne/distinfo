@@ -6,10 +6,12 @@ from subprocess import list2cmdline
 
 from munch import munchify
 
+from pip._vendor.packaging.requirements import InvalidRequirement
+
 from tox.config import parseconfig
 from tox.exception import ConfigError
 
-from .. import registry
+from ..requirement import parse_requirement
 from .collector import Collector
 
 log = logging.getLogger(__name__)
@@ -37,8 +39,8 @@ class ToxIni(Collector):
 
         for command in config.commands:
             if command[0:2] == ["pip", "install"]:
-                req = registry.Requirement.from_line(list2cmdline(command[2:]))
-                self.add_requirement(req)
+                req = parse_requirement(list2cmdline(command[2:]))
+                self.add_requirement(req.req)
             else:
                 cmd = []
                 for expr in command:
@@ -47,9 +49,9 @@ class ToxIni(Collector):
                 if cmd.startswith("-"):
                     cmd = "%s || true" % cmd[1:].strip()
                 commands.append(cmd)
-        for req in config.deps:
-            if req.name.startswith("-r"):
-                reqs_file = req.name[2:]
+        for dep in config.deps:
+            if dep.name.startswith("-r"):
+                reqs_file = dep.name[2:].strip()
                 if not Path(reqs_file).exists():
                     log.warning(
                         "%r %r from tox.ini does not exist",
@@ -58,10 +60,11 @@ class ToxIni(Collector):
                     )
                     continue
                 self.add_requirements_file(reqs_file)
-            elif req.name.startswith("-c"):
-                continue
             else:
-                self.add_requirement(req)
+                try:
+                    self.add_requirement(str(dep))
+                except InvalidRequirement as exc:
+                    log.warning("%r %r raised %r", self, dep, exc)
         for key in config.setenv.keys():
             if key in ("PYTHONHASHSEED", "PYTHONPATH"):
                 continue

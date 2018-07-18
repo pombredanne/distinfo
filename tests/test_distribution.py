@@ -1,3 +1,5 @@
+from pip._vendor.packaging.requirements import InvalidRequirement
+
 import pytest
 
 from setuptools import sandbox
@@ -25,9 +27,7 @@ class TestDistribution(TestCase):
 
     def test_bad_requirement(self):
         dist = Distribution()
-        dist.add_requirement("xxx")
-        dist.add_requirement("-cxxx")
-        assert {"xxx"} == dist.reqs
+        pytest.raises(InvalidRequirement, dist.add_requirement, "-cxxx")
 
     def test_bad_setup(self, monkeypatch):
         # pylint: disable=protected-access

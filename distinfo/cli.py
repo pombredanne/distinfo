@@ -1,12 +1,13 @@
 import logging
 from pathlib import Path
-import pkg_resources
 
 import appdirs
 
 import click
 
 from munch import munchify
+
+import pkg_resources
 
 from ptpython import repl
 

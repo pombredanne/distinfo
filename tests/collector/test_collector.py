@@ -1,9 +1,9 @@
 from setuptools import sandbox
 
+from munch import Munch
+
 from distinfo.distribution import Distribution
 from distinfo.collectors.collector import Collector, PackageCollector
-
-from munch import Munch
 
 from ..cases import TestCase
 

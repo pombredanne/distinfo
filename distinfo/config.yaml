@@ -6,11 +6,11 @@ collectors:
   - Pep518
   - Pipfile
   - ToxIni
-  - Nose
-  - Pytest
   - RequirementsFile
   - FindTests
   - PipReqs
+  - Nose
+  - Pytest
 
 # import name => package name
 package_aliases:

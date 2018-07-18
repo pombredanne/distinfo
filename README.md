@@ -20,10 +20,10 @@ Dump json metadata to stdout:
 Print dependencies and metadata:
 
 ``` python
->>> from distinfo import Requirement, dump
+>>> from distinfo import Distribution, dump
 >>>
->>> req = Requirement.from_source(".")
->>> dump(req.dist.depends)
+>>> dist = Distribution.from_source(".")
+>>> dump(dist.depends)
 {
   "build": [
     "setuptools-scm"
@@ -39,7 +39,7 @@ Print dependencies and metadata:
     "pytest",
   ]
 }
->>> print(req.dist.metadata)
+>>> print(dist.metadata)
 {
   "author": "A N Other",
   "author_email": "a@example.org",

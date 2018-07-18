@@ -2,7 +2,8 @@ from setuptools import sandbox
 
 import pytest
 
-from distinfo import Distribution, DistInfoException
+from distinfo.distribution import Distribution
+from distinfo.exc import DistInfoException
 
 from .cases import TestCase
 

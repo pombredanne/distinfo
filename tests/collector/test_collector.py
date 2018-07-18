@@ -1,6 +1,6 @@
 from setuptools import sandbox
 
-from distinfo import Distribution
+from distinfo.distribution import Distribution
 from distinfo.collectors.collector import Collector, PackageCollector
 
 from ..cases import TestCase

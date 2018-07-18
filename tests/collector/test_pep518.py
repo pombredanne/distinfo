@@ -1,5 +1,5 @@
-from distinfo import Requirement
 from distinfo.collectors import Pep518
+from distinfo.requirement import Requirement
 
 from .cases import TestCase
 

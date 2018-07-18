@@ -1,8 +1,7 @@
 # monkey patch must be first
 from . import monkey
-from .distribution import Distribution
 from .exc import DistInfoException
-from .requirement import Requirement
+from .registry import Distribution, Requirement
 from .util import dump, dumps
 
 

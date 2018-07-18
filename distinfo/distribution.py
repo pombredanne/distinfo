@@ -9,9 +9,9 @@ from pip._internal.exceptions import InstallationError
 
 from property_manager import cached_property
 
+from . import registry
 from .base import Base
 from .config import cfg
-from .requirement import Requirement
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class Distribution(Base, pkg_resources.Distribution):
 
     @classmethod
     def from_source(cls, source_dir):
-        req = Requirement.from_source(source_dir)
+        req = registry.Requirement.from_source(source_dir)
         return cls.from_req(req)
 
     @classmethod
@@ -64,11 +64,11 @@ class Distribution(Base, pkg_resources.Distribution):
 
     @cached_property
     def reqs(self):
-        from .requirement import Requirement
+        from . import registry
         reqs = set()
         for req in self.requires_dist:
             try:
-                reqs.add(Requirement.from_req(req))
+                reqs.add(registry.Requirement.from_req(req))
             except InstallationError as exc:
                 log.warning("%r requirement %r fail: %r", self, req, exc)
         return reqs

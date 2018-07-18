@@ -9,7 +9,7 @@ from munch import munchify
 from tox.config import parseconfig
 from tox.exception import ConfigError
 
-from ..requirement import Requirement
+from .. import registry
 from .collector import Collector
 
 log = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ class ToxIni(Collector):
 
         for command in config.commands:
             if command[0:2] == ["pip", "install"]:
-                req = Requirement.from_line(list2cmdline(command[2:]))
+                req = registry.Requirement.from_line(list2cmdline(command[2:]))
                 self.add_requirement(req)
             else:
                 cmd = []

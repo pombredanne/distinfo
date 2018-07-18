@@ -1,5 +1,5 @@
-from distinfo import Requirement
 from distinfo.collectors import EggInfo
+from distinfo.requirement import Requirement
 
 from .cases import TestCase
 

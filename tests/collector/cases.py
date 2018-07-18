@@ -1,4 +1,4 @@
-from distinfo import Distribution
+from distinfo.distribution import Distribution
 
 from ..cases import TestCase as _TestCase
 

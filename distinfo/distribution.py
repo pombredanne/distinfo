@@ -3,7 +3,7 @@ import logging
 
 import pkg_resources
 
-from munch import DefaultFactoryMunch, Munch
+from munch import Munch
 
 from pip._internal.exceptions import InstallationError
 
@@ -76,7 +76,7 @@ class Distribution(Base, pkg_resources.Distribution):
     @cached_property
     def depends(self):
         reqs = set(map(copy.deepcopy, self.reqs))
-        depends = DefaultFactoryMunch(set)
+        depends = Munch()
         run = set(filter(lambda r: r.markers is None, self.reqs))
         if run:
             depends["run"] = run

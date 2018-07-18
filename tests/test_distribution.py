@@ -1,6 +1,6 @@
-from setuptools import sandbox
-
 import pytest
+
+from setuptools import sandbox
 
 from distinfo.distribution import Distribution
 from distinfo.exc import DistInfoException
@@ -22,7 +22,6 @@ class TestDistribution(TestCase):
         dist.add_requirement("xxx")
         assert {"xxx"} == dist.requires_dist
         assert {"xxx"} == dist.depends.run
-        assert not dist.depends.test
 
     def test_bad_requirement(self):
         dist = Distribution()
@@ -38,14 +37,9 @@ class TestDistribution(TestCase):
         # pylint: disable=protected-access
         name = "test.dist"
         original = sandbox._execfile
-
-        def _execfile(*_a, **_kw):
-            raise BaseException("xxx")
-        monkeypatch.setattr(sandbox, "_execfile", _execfile)
+        monkeypatch.setattr(sandbox, "_execfile", self._make_raiser(BaseException))
         pytest.raises(DistInfoException, self.dist, name)
-
-        def _execfile(*a, **kw):
-            original(*a, *kw)
-            raise BaseException("xxx")
-        monkeypatch.setattr(sandbox, "_execfile", _execfile)
+        monkeypatch.setattr(sandbox,
+                            "_execfile",
+                            self._make_raiser(BaseException, function=original))
         self.dist(name)

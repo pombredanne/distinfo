@@ -46,9 +46,7 @@ class TestRequirementsFile(TestCase):
         assert not dist.depends
 
     def test_collect_error(self, monkeypatch, tmpdir):
-        def raiser(*_a, **_kw):
-            raise ConfigError()
-        monkeypatch.setattr(toxini, "parseconfig", raiser)
+        monkeypatch.setattr(toxini, "parseconfig", self._make_raiser(ConfigError))
         tmpdir.join("tox.ini").write(TOXINI)
         dist = self._collect(tmpdir)
         assert not dist.depends

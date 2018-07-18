@@ -1,10 +1,11 @@
 import configparser
 import logging
 from pathlib import Path
-from setuptools import sandbox
 import sys
 
 from pip._internal.req import parse_requirements
+
+from setuptools import sandbox
 
 from ..base import Base
 

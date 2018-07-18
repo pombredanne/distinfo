@@ -22,8 +22,6 @@ class TestPipReqs(TestCase):
 
     def test_collect_fail(self, monkeypatch, tmpdir):
         tmpdir.join("xxx").mkdir().join("__init__.py") .write("import aaa")
-        def _raiser(_p):
-            raise Exception()
-        monkeypatch.setattr(pipreqs, "get_pkg_names", _raiser)
-        dist = self._collect(tmpdir)
-        assert not dist.ext.imports.xxx
+        monkeypatch.setattr(pipreqs, "get_pkg_names", self._make_raiser())
+        dist = self._collect(tmpdir, packages=["xxx"])
+        assert not hasattr(dist.ext, "imports")

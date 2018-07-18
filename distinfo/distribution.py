@@ -29,7 +29,8 @@ class Distribution(Base, wrapt.ObjectProxy):
         if req is not None:
             from . import collectors
             for name in cfg.collectors:
-                getattr(collectors, name)(self, req.source_dir, req=req).collect()
+                collector = getattr(collectors, name)
+                collector(self, req.source_dir, req=req).collect()
 
     def __str__(self):
         version = getattr(self, "version", "unversioned")
@@ -64,12 +65,13 @@ class Distribution(Base, wrapt.ObjectProxy):
 
     def _filter_reqs(self, reqs, extra=None):
         filtered = set()
+        env = dict(extra=extra)
         for req in reqs:
             if extra is None:
-                if req.marker is None or req.marker.evaluate(dict(extra=extra)):
+                if req.marker is None or req.marker.evaluate(env):
                     filtered.add(req)
             else:
-                if req.marker is not None and req.marker.evaluate(dict(extra=extra)):
+                if req.marker is not None and req.marker.evaluate(env):
                     filtered.add(req)
         return filtered
 

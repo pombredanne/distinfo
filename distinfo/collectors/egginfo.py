@@ -33,6 +33,4 @@ class EggInfo(Collector):
                 self.dist.setdefault(key, set()).add(value)
             else:
                 self.dist[key] = value
-                if key == "name":
-                    self.dist.project_name = value
         self.req.source_dir = source_dir

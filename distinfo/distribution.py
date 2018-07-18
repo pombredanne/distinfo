@@ -1,13 +1,13 @@
 import copy
 import logging
 
-import pkg_resources
-
 from munch import Munch
 
 from pip._internal.exceptions import InstallationError
 
 from property_manager import cached_property
+
+import wrapt
 
 from . import registry
 from .base import Base
@@ -16,39 +16,33 @@ from .config import cfg
 log = logging.getLogger(__name__)
 
 
-class Distribution(Base, pkg_resources.Distribution):
+class Distribution(Base, wrapt.ObjectProxy):
 
-    def __init__(self, **kwargs):
+    def __init__(self, req=None, **kwargs):
         metadata = Munch(
             requires_dist=set(),
             provides_extra=set(),
             extensions=Munch(distinfo=Munch()),
         )
         metadata.update(kwargs)
-        super_kw = dict(metadata=metadata)
-        if "name" in metadata:
-            super_kw["project_name"] = metadata.name
-        super().__init__(**super_kw)
+        super().__init__(metadata)
+        if req is not None:
+            from . import collectors
+            for name in cfg.collectors:
+                getattr(collectors, name)(self, req.source_dir, req=req).collect()
 
     def __str__(self):
-        return super().__str__().replace(" ", "-")
+        version = getattr(self, "version", "unversioned")
+        return "%s-%s" % (self.name, version)
+
+    @property
+    def name(self):
+        return getattr(self, "name", "unnamed")
 
     @classmethod
     def from_source(cls, source_dir):
         req = registry.Requirement.from_source(source_dir)
-        return cls.from_req(req)
-
-    @classmethod
-    def from_req(cls, req):
-        from . import collectors
-        dist = cls()
-        for name in cfg.collectors:
-            getattr(collectors, name)(dist, req.source_dir, req=req).collect()
-        return dist
-
-    @property
-    def metadata(self):
-        return self._provider
+        return cls(req=req)
 
     @property
     def ext(self):
@@ -60,7 +54,7 @@ class Distribution(Base, pkg_resources.Distribution):
             req = "%s; extra == '%s'" % (req, extra)
         self.requires_dist.add(req)
         del self.reqs
-        del self.depends
+        del self.requires
 
     @cached_property
     def reqs(self):
@@ -74,25 +68,18 @@ class Distribution(Base, pkg_resources.Distribution):
         return reqs
 
     @cached_property
-    def depends(self):
+    def requires(self):
         reqs = set(map(copy.deepcopy, self.reqs))
-        depends = Munch()
+        requires = Munch()
         run = set(filter(lambda r: r.markers is None, self.reqs))
         if run:
-            depends["run"] = run
+            requires["run"] = run
             reqs -= run
         for extra in self.provides_extra:
-            depends[extra] = set(map(
+            requires[extra] = set(map(
                 # take the marker off the requirement
                 lambda r: setattr(r.req, "marker", None) or r,
                 # pylint: disable=cell-var-from-loop
                 filter(lambda r: r.markers.evaluate(dict(extra=extra)), reqs)
             ))
-        return depends
-
-    # for compatibility with pkg_resources
-    @property
-    def _dep_map(self):
-        depends = self.depends.copy()
-        depends[None] = depends.pop("run", [])
-        return depends
+        return requires

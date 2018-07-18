@@ -23,7 +23,7 @@ Print dependencies and metadata:
 >>> from distinfo import Distribution, dump
 >>>
 >>> dist = Distribution.from_source(".")
->>> dump(dist.depends)
+>>> dump(dist.requires)
 {
   "build": [
     "setuptools-scm"

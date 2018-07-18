@@ -10,4 +10,4 @@ class TestRequirementsFile(TestCase):
     def test_collect(self, tmpdir):
         tmpdir.join("requirements-test.txt").write("aaa")
         dist = self._collect(tmpdir)
-        assert {"aaa"} == dist.depends.test
+        assert {"aaa"} == dist.requires.test

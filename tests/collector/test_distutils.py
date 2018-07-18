@@ -20,6 +20,6 @@ class TestDistutils(TestCase):
     def test_collect(self, tmpdir):
         tmpdir.join("setup.py").write(SETUP)
         dist = self._collect(tmpdir)
-        assert {"setuptools"} == dist.depends.build
-        assert {"bbb"} == dist.depends.run
-        assert {"ccc", "ddd"} == dist.depends.test
+        assert {"setuptools"} == dist.requires.build
+        assert {"bbb"} == dist.requires.run
+        assert {"ccc", "ddd"} == dist.requires.test

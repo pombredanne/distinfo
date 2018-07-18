@@ -23,7 +23,7 @@ class TestPytest(TestCase):
         with sandbox.pushd(tmpdir):
             collector.add_requirements_file(requirements)
             collector.add_requirements_file(requirements)
-        assert {"aaa"} == dist.depends.test
+        assert {"aaa"} == dist.requires.test
 
     def test_package_collector(self, tmpdir):
         dist = Distribution(name="xxx")
@@ -31,11 +31,11 @@ class TestPytest(TestCase):
         dist.ext.packages = ["xxx"]
         collector = XCollector(dist, tmpdir)  # pylint: disable=not-callable
         collector.collect()
-        print(dist.depends)
-        assert {XCollector.name} == dist.depends.run
+        print(dist.requires)
+        assert {XCollector.name} == dist.requires.run
 
     def test_package_collector_self(self, tmpdir):
         dist = Distribution(name=XCollector.name)
         collector = XCollector(dist, tmpdir)  # pylint: disable=not-callable
         collector.collect()
-        assert not dist.depends
+        assert not dist.requires

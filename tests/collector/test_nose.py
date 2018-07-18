@@ -10,4 +10,4 @@ class TestNose(TestCase):
     def test_collect(self, tmpdir):
         tmpdir.join(".noserc").write("x")
         dist = self._collect(tmpdir)
-        assert {"nose"} == dist.depends.test
+        assert {"nose"} == dist.requires.test

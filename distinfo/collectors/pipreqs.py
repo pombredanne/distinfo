@@ -48,7 +48,7 @@ class PipReqs(Collector):
         # check dist package
         distpkg = imports.get(self.dist.name)
         if distpkg is not None:
-            run = getattr(self.dist.depends, "run", set())
+            run = getattr(self.dist.requires, "run", set())
             missing = []
             for pkg in distpkg:
                 if pkg not in run and pkg.replace("_", "-") not in run:

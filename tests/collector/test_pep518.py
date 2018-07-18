@@ -22,4 +22,4 @@ class TestPep518(TestCase):
         tmpdir.join("setup.py").write(SETUP)
         tmpdir.join("pyproject.toml").write(PYPROJECT)
         dist = self._collect(tmpdir, req=Requirement.from_source(tmpdir))
-        assert {"zzz"} == dist.depends.build
+        assert {"zzz"} == dist.requires.build

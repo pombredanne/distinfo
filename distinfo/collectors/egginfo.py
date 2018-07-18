@@ -30,9 +30,9 @@ class EggInfo(Collector):
             if key == "keywords":
                 value = sorted(value.split())
             if key in self.MULTI_KEYS:
-                self.dist.metadata.setdefault(key, set()).add(value)
+                self.dist.setdefault(key, set()).add(value)
             else:
-                self.dist.metadata[key] = value
+                self.dist[key] = value
                 if key == "name":
                     self.dist.project_name = value
         self.req.source_dir = source_dir

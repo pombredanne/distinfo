@@ -36,17 +36,17 @@ class TestRequirementsFile(TestCase):
         tmpdir.join("tox.ini").write(TOXINI)
         tmpdir.join("requirements.txt").write("aaa")
         dist = self._collect(tmpdir)
-        assert {"aaa", "xxx", "zzz"} == dist.depends.test
+        assert {"aaa", "xxx", "zzz"} == dist.requires.test
         assert ["python -m pytest", "false || true"] == dist.ext.tox.commands
         assert dist.ext.tox.setenv.ONE == "1"
 
     def test_collect_bad(self, tmpdir):
         tmpdir.join("tox.ini").write(TOXINI_BAD)
         dist = self._collect(tmpdir)
-        assert not dist.depends
+        assert not dist.requires
 
     def test_collect_error(self, monkeypatch, tmpdir):
         monkeypatch.setattr(toxini, "parseconfig", self._make_raiser(ConfigError))
         tmpdir.join("tox.ini").write(TOXINI)
         dist = self._collect(tmpdir)
-        assert not dist.depends
+        assert not dist.requires

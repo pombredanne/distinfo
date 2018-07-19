@@ -11,6 +11,8 @@ class TestCase(_TestCase):
         dist = Distribution()
         if name is not None:
             dist["name"] = name
+        for req in kwargs.pop("reqs", []):
+            dist.add_requirement(req)
         dist.ext.update(kwargs)
         collector = self.collector(dist, source_dir)  # pylint: disable=not-callable
         collector.collect()

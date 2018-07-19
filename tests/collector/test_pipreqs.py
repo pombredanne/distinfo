@@ -6,6 +6,7 @@ from .cases import TestCase
 
 PACKAGE = """
 import aaa
+import ccc
 """
 
 TESTS = """
@@ -26,8 +27,9 @@ class TestPipReqs(TestCase):
             name="xxx",
             packages=["xxx", "tests"],
             tests=["tests"],
+            reqs=["ccc"],
         )
-        assert collector.ext.imports.xxx == {"aaa"}
+        assert collector.ext.imports.xxx == {"aaa", "ccc"}
         assert collector.ext.imports.tests == {"bbb"}
         assert "missing run dependencies" in caplog.text
         assert "missing test dependencies" in caplog.text

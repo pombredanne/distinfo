@@ -16,7 +16,7 @@ push: result
 
 .PHONY: test
 test:
-	pytest $(ARGS)
+	pytest tests $(ARGS)
 
 .PHONY: lint
 lint:

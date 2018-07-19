@@ -10,7 +10,7 @@ from pkg_resources import RequirementParseError
 from tox.config import parseconfig
 from tox.exception import ConfigError
 
-from .. import registry
+from ..requirement import Requirement
 from .collector import Collector
 
 log = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ class ToxIni(Collector):
             if command[0:2] == ["pip", "install"]:
                 command = command[2:]
                 try:
-                    req = registry.Requirement.parse(list2cmdline(command))
+                    req = Requirement.parse(list2cmdline(command))
                 except RequirementParseError as exc:
                     log.warning("%r raised %r", self, exc)
                     continue

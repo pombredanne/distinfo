@@ -12,9 +12,10 @@ from requirementslib.models.requirements import FileRequirement
 
 import wrapt
 
-from . import registry, util
+from . import util
 from .base import Base
 from .config import cfg
+from .requirement import Requirement
 
 log = logging.getLogger(__name__)
 
@@ -81,11 +82,10 @@ class Distribution(Base, wrapt.ObjectProxy):
 
     @property
     def reqs(self):
-        from . import registry
         reqs = set()
         for req_str in self.requires_dist:
             try:
-                req = registry.Requirement(req_str)
+                req = Requirement(req_str)
             except InvalidRequirement as exc:
                 log.warning("%r requirement %r raised: %r", self, req_str, exc)
                 self.requires_dist.remove(req_str)
@@ -137,13 +137,13 @@ class Distribution(Base, wrapt.ObjectProxy):
         # cast to Requirement
         if isinstance(req, str):
             try:
-                req = registry.Requirement(req)
+                req = Requirement(req)
             except InvalidRequirement as exc:
                 log.warning("%r %r add %r raised %r", self, extra, req, exc)
                 return
         else:
             # belt and braces
-            assert isinstance(req, registry.Requirement)
+            assert isinstance(req, Requirement)
 
         # try to merge with existing
         mreq = self._merge_requirement(req, extra)

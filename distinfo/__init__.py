@@ -1,5 +1,6 @@
 from . import monkey
-from .registry import Distribution, Requirement
+from .distribution import Distribution
+from .requirement import Requirement
 from .util import dump, dumps
 
 del monkey

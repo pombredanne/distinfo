@@ -5,8 +5,8 @@ import sys
 
 from setuptools import sandbox
 
-from .. import registry
 from ..base import Base
+from ..requirement import Requirement
 
 log = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ class Collector(Base):
             log.warning("%r already seen %r", self, path)
             return
         self._seen_files.add(path)
-        for req in registry.Requirement.parse_file(path):
+        for req in Requirement.parse_file(path):
             self.add_requirement(req, extra)
 
     def _get_setup_cfg(self):

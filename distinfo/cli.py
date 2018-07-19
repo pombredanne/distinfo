@@ -11,8 +11,10 @@ import pkg_resources
 
 from ptpython import repl
 
-from . import registry, util
+from . import util
 from .config import cfg, configure_logging
+from .distribution import Distribution
+from .requirement import Requirement
 
 VERSION = pkg_resources.get_distribution("distinfo").version
 
@@ -40,12 +42,12 @@ def main(source_dir, **options):
         cfg.logging.config.isatty = True
     configure_logging()
 
-    dist = registry.Distribution.from_source(source_dir)
+    dist = Distribution.from_source(source_dir)
 
     if options.interactive:
         namespace = dict(
-            Distribution=registry.Distribution,
-            Requirement=registry.Requirement,
+            Distribution=Distribution,
+            Requirement=Requirement,
             dist=dist,
             dump=util.dump,
             dumps=util.dumps,

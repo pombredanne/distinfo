@@ -99,7 +99,10 @@ class Distribution(Base, wrapt.ObjectProxy):
             requires["run"] = run
             reqs -= run
         for extra in self.provides_extra:
-            filtered = set(self._filter_reqs(reqs, extra=extra))
+            # set the marker to None as it has already served its purpose and
+            # now is just noise
+            filtered = set(map(lambda r: setattr(r, "marker", None) or r,
+                               self._filter_reqs(reqs, extra=extra)))
             if filtered:
                 requires[extra] = filtered
         return requires

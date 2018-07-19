@@ -13,7 +13,7 @@ class Requirement(Base, _Requirement):
 
     def __hash__(self):
         # HACK: used by set __contains__
-        return hash(self.name)
+        return hash(self.name.lower())
 
     def __eq__(self, other):
         if isinstance(other, str):

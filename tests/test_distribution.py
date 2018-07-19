@@ -30,9 +30,9 @@ class TestDistribution(TestCase):
 
     def test_add_requirement_merge_markers(self):
         dist = Distribution()
-        req = dist.add_requirement("xxx")
-        assert req.marker is None
         req = dist.add_requirement("xxx; python_version > '1'")
+        assert req.marker is not None
+        req = dist.add_requirement("xxx")
         assert req.marker is not None
         req = dist.add_requirement("xxx; python_version < '2'")
         assert str(req.marker) == 'python_version > "1" and python_version < "2"'

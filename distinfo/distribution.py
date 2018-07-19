@@ -73,19 +73,27 @@ class Distribution(Base, wrapt.ObjectProxy):
                     filtered.add(req)
         return filtered
 
-    @cached_property
-    def requires(self):
+    @property
+    def reqs(self):
         from . import registry
         reqs = set()
-        for req in self.requires_dist:
+        for req_str in self.requires_dist:
             try:
-                req = registry.Requirement(req)
+                req = registry.Requirement(req_str)
             except InvalidRequirement as exc:
-                log.warning("%r requirement %r raised: %r", self, req, exc)
-                self.requires_dist.remove(req)
+                log.warning("%r requirement %r raised: %r", self, req_str, exc)
+                self.requires_dist.remove(req_str)
             else:
+                # keep the requirement string which may be needed later to
+                # remove it from `requires_dist`
+                req.req_str = req_str
                 reqs.add(req)
+        return reqs
+
+    @cached_property
+    def requires(self):
         requires = Munch()
+        reqs = self.reqs
         run = self._filter_reqs(reqs)
         if run:
             requires["run"] = run
@@ -99,18 +107,18 @@ class Distribution(Base, wrapt.ObjectProxy):
     def _merge_requirement(self, mreq, extra):
         for req in self.requires.get(extra, []):
             if mreq.name == req.name:
-                str_req = str(req)
-                req.specifier &= mreq.specifier
-                if mreq.marker is not None:
-                    if req.marker is None:
-                        req.marker = mreq.marker
+                mreq.specifier &= req.specifier
+                if req.marker is not None:
+                    if mreq.marker is None:
+                        mreq.marker = req.marker
                     else:
-                        req.marker = Marker("(%s) and %s" % (req.marker, mreq.marker))
-                return req, str_req
+                        mreq.marker = Marker("(%s) and %s" % (req.marker, mreq.marker))
+                return mreq, req
 
     def _add_requirement(self, req, old=None):
         if old is not None:
-            self.requires_dist.remove(old)
+            log.debug("%r replacing %r with %r", self, old, req)
+            self.requires_dist.remove(old.req_str)
         self.requires_dist.add(str(req))
         del self.requires
         return req

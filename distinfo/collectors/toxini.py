@@ -32,7 +32,7 @@ class ToxIni(Collector):
         name = "py%d%d" % (sys.version_info.major, sys.version_info.minor)
         config = toxconf.envconfigs.get(name)
         if config is None:
-            log.warning("%r has no environment for %s", self, name)
+            log.warning("%r has no %s environment", self, name)
             return
 
         # dependencies

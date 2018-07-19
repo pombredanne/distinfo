@@ -47,6 +47,7 @@ class Distribution(Base, wrapt.ObjectProxy):
                 "distinfo.collectors.%s" % name.lower()
             )
             getattr(module, name)(dist, req.path).collect()
+        assert dist.name != "UNKNOWN", "Metadata unavailable"
         # XXX: a side effect of the below is that `requires` will remove any
         # invalid requirements
         log.debug(

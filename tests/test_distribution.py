@@ -66,8 +66,8 @@ class TestDistribution(TestCase):
         assert not hasattr(dist.requires, "yyy")
         assert "InvalidRequirement" in caplog.text
 
-    def test_from_source(self):
-        name = "test.dist"
-        dist = Distribution.from_source(self.data_path / name)
-        assert dist.name == name
+    def test_from_source(self, tmpdir):
+        sdist = self._sdist(tmpdir)
+        dist = Distribution.from_source(sdist)
+        assert dist.name == "test.dist"
         assert dist.requires.run == {"xxx"}

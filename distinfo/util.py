@@ -19,7 +19,7 @@ def _todict(obj):
         if isinstance(value, dict):
             value = _todict(value)
         if isinstance(value, set):
-            value = sorted(map(str, value))
+            value = sorted(map(str, value), key=str.lower)
         result[key] = value
     return unmunchify(result)
 

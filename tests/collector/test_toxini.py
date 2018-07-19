@@ -1,6 +1,9 @@
+from pkg_resources import RequirementParseError
+
 from tox.exception import ConfigError
 
 from distinfo.collectors import toxini
+from distinfo.requirement import Requirement
 
 from .cases import TestCase
 
@@ -22,6 +25,12 @@ setenv =
     ONE = 1
 """
 
+REQUIREMENTS = """
+# comment
+
+aaa
+"""
+
 TOXINI_BAD = """
 [tox]
 envlist = xxx
@@ -34,19 +43,29 @@ class TestRequirementsFile(TestCase):
 
     def test_collect(self, tmpdir):
         tmpdir.join("tox.ini").write(TOXINI)
-        tmpdir.join("requirements.txt").write("aaa")
-        dist = self._collect(tmpdir)
-        assert {"aaa", "xxx", "zzz"} == dist.requires.test
-        assert ["python -m pytest", "false || true"] == dist.ext.tox.commands
-        assert dist.ext.tox.setenv.ONE == "1"
+        tmpdir.join("requirements.txt").write(REQUIREMENTS)
+        collector = self._collect(tmpdir)
+        assert {"aaa", "xxx", "zzz"} == collector.requires.test
+        assert ["python -m pytest", "false || true"] == collector.ext.tox.commands
+        assert collector.ext.tox.env.ONE == "1"
 
     def test_collect_bad(self, tmpdir):
         tmpdir.join("tox.ini").write(TOXINI_BAD)
-        dist = self._collect(tmpdir)
-        assert not dist.requires
+        collector = self._collect(tmpdir)
+        assert not collector.requires
 
-    def test_collect_error(self, monkeypatch, tmpdir):
-        monkeypatch.setattr(toxini, "parseconfig", self._make_raiser(ConfigError))
+    def test_collect_conf_error(self, monkeypatch, tmpdir):
+        monkeypatch.setattr(toxini, "parseconfig", self._raiser(ConfigError))
         tmpdir.join("tox.ini").write(TOXINI)
-        dist = self._collect(tmpdir)
-        assert not dist.requires
+        collector = self._collect(tmpdir)
+        assert not collector.requires
+
+    def test_collect_req_error(self, monkeypatch, tmpdir):
+        monkeypatch.setattr(
+            Requirement,
+            "parse",
+            self._raiser(RequirementParseError),
+        )
+        tmpdir.join("tox.ini").write(TOXINI)
+        collector = self._collect(tmpdir)
+        assert {"zzz"} == collector.requires.test

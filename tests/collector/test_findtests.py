@@ -1,4 +1,4 @@
-from distinfo.collectors import FindTests
+from distinfo.collectors.findtests import FindTests
 
 from .cases import TestCase
 
@@ -9,9 +9,9 @@ class TestFindTests(TestCase):
 
     def test_collect(self, tmpdir):
         tmpdir.join("test.py").write("True")
-        dist = self._collect(tmpdir)
-        assert dist.ext.tests
+        collector = self._collect(tmpdir)
+        assert collector.ext.tests
 
     def test_collect_false(self, tmpdir):
-        dist = self._collect(tmpdir)
-        assert not dist.ext.tests
+        collector = self._collect(tmpdir)
+        assert not hasattr(collector.ext, "tests")

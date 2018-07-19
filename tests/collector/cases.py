@@ -7,9 +7,11 @@ class TestCase(_TestCase):
 
     collector = None
 
-    def _collect(self, source_dir, req=None, **kwargs):
-        dist = Distribution(name="xxx")
+    def _collect(self, source_dir, name=None, **kwargs):
+        dist = Distribution()
+        if name is not None:
+            dist["name"] = name
         dist.ext.update(kwargs)
-        collector = self.collector(dist, source_dir, req=req)  # pylint: disable=not-callable
+        collector = self.collector(dist, source_dir)  # pylint: disable=not-callable
         collector.collect()
-        return dist
+        return collector

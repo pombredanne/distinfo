@@ -12,48 +12,60 @@ log = logging.getLogger(__name__)
 
 class PipReqs(Collector):
 
-    def _get_packages(self, package):
-        path = package.replace(".", "/")
+    IGNORE = (
+        "setuptools",
+    )
+
+    def _get_packages(self, path):
         try:
             return set(
-                map(
-                    lambda p: cfg.package_aliases.get(p, p),
+                filter(
+                    lambda p: p != self.dist.name and p not in self.IGNORE,
                     map(
-                        str.lower,
-                        pipreqs.get_pkg_names(pipreqs.get_all_imports(path)),
+                        lambda p: cfg.package_aliases.get(p, p),
+                        map(
+                            str.lower,
+                            pipreqs.get_pkg_names(pipreqs.get_all_imports(path)),
+                        )
                     )
                 )
             )
-        except Exception as exc:
-            log.exception("%r fail: %r", self, exc)
+        except Exception as exc:  # pylint: disable=broad-except
+            self._warn_exc(exc)
             return set()
+
+    def _warn_missing(self, extra, reqs, imports):
+        missing = []
+        for pkg in imports:
+            if pkg not in reqs and pkg.replace("_", "-") not in reqs:
+                missing.append(pkg)
+        if missing:
+            log.warning(
+                "%s missing %s dependencies: %s",
+                self,
+                extra,
+                ", ".join(missing),
+            )
 
     def _collect(self):
 
-        imports = Munch()
+        self.ext.imports = Munch()
+
+        log.debug(repr(self.dist))
 
         # check each package
-        packages = getattr(self.dist.ext, "packages", [])
+        packages = getattr(self.ext, "packages", [])
         for package in packages:
-            pkgs = self._get_packages(package)
-            if pkgs:
-                imports[package] = pkgs
-
-        # remove self references
-        for pkg_imports in imports.values():
-            for package in packages:
-                if package in pkg_imports:
-                    pkg_imports.remove(package)
+            self.ext.imports[package] = self._get_packages(package) - {self.dist.name}
 
         # check dist package
-        distpkg = imports.get(self.dist.name)
-        if distpkg is not None:
-            run = getattr(self.dist.requires, "run", set())
-            missing = []
-            for pkg in distpkg:
-                if pkg not in run and pkg.replace("_", "-") not in run:
-                    missing.append(pkg)
-            if missing:
-                log.warning("%s missing run dependencies: %r", self, missing)
-        if imports:
-            self.dist.ext.imports = imports
+        reqs = getattr(self.dist.requires, "run", set()) | {self.dist.name}
+        run_imports = self.ext.imports.get(self.dist.name, set())
+        self._warn_missing("run", reqs, run_imports)
+
+        # check tests
+        reqs |= getattr(self.dist.requires, "test", set())
+        test_imports = set()
+        for path in getattr(self.ext, "tests", []):
+            test_imports |= self._get_packages(path)
+        self._warn_missing("test", reqs, test_imports)

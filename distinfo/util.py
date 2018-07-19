@@ -32,3 +32,11 @@ def dumps(obj, fmt=None, **kwargs):
 
 def dump(obj, file=sys.stdout, **kwargs):
     print(dumps(obj, **kwargs), file=file)
+
+
+def dotget(obj, attrs, default=None):
+    attrs = attrs.split(".")
+    key = attrs.pop()
+    for attr in attrs:
+        obj = obj.get(attr, {})
+    return obj.get(key, default)

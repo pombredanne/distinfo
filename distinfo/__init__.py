@@ -1,8 +1,7 @@
-# monkey patch must be first
 from . import monkey
-from .exc import DistInfoException
 from .registry import Distribution, Requirement
 from .util import dump, dumps
 
+del monkey
 
-__all__ = ("DistInfoException", "Distribution", "Requirement", "dump", "dumps")
+__all__ = ("Distribution", "Requirement", "dump", "dumps")

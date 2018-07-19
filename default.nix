@@ -68,6 +68,21 @@ with rec {
     };
   };
 
+  capturer = python.pkgs.buildPythonPackage rec {
+    pname = "capturer";
+    version = "2.4";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "090142a58f3f85def3a7dd55d9024d0d1a86d1a88aaf9317c0f146244994a615";
+    };
+    propagatedBuildInputs = [ humanfriendly ];
+    doCheck = false;
+    meta = {
+      description = "Easily capture stdout/stderr of the current process and subprocesses";
+      homepage = https://capturer.readthedocs.io;
+    };
+  };
+
   certifi = python.pkgs.buildPythonPackage rec {
     pname = "certifi";
     version = "2018.4.16";
@@ -363,22 +378,6 @@ with rec {
     };
   };
 
-  pip = python.pkgs.buildPythonPackage rec {
-    pname = "pip";
-    version = "10.0.1";
-    src = python.pkgs.fetchPypi {
-      inherit pname version;
-      sha256 = "f2bd08e0cd1b06e10218feaf6fef299f473ba706582eb3bd9d52203fdbd7ee68";
-    };
-    doCheck = false;
-    installFlags = [ "--ignore-installed" ];
-    meta = {
-      description = "The PyPA recommended tool for installing Python packages.";
-      homepage = https://pip.pypa.io/;
-      license = lib.licenses.mit;
-    };
-  };
-
   pipreqs = python.pkgs.buildPythonPackage rec {
     pname = "pipreqs";
     version = "0.4.9";
@@ -604,6 +603,21 @@ with rec {
       description = "py.test is a plugin for py.test that changes the default look and feel of py.test (e.g. progressbar, show tests that fail instantly).";
       homepage = http://pivotfinland.com/pytest-sugar/;
       license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  pytoml = python.pkgs.buildPythonPackage rec {
+    pname = "pytoml";
+    version = "0.1.18";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "dae3c4e31d09eb06a6076d671f2281ee5d2c43cbeae16599c3af20881bb818ac";
+    };
+    doCheck = false;
+    meta = {
+      description = "A parser for TOML-0.4.0";
+      homepage = https://github.com/avakar/pytoml;
+      license = lib.licenses.mit;
     };
   };
 
@@ -980,18 +994,19 @@ python.pkgs.buildPythonPackage rec {
   buildInputs = [ pytest-runner ];
   propagatedBuildInputs = [
     appdirs
+    capturer
     click
     coloredlogs
     munch
     pdbpp
     pkgs.glibcLocales
-    pip
     pipreqs
     property-manager
     ptpython
     pycmd
     pytest-cov
     pytest-sugar
+    pytoml
     PyYAML
     requirementslib
     tox
@@ -1001,7 +1016,6 @@ python.pkgs.buildPythonPackage rec {
   LANG = "en_US.UTF-8";
   checkPhase = "HOME=$NIX_BUILD_TOP pytest && cp coverage.xml $out";
   postInstall = "wrapProgram $out/bin/distinfo --set LANG ${LANG}";
-  doCheck = false;
   meta = {
     description = "Extract metadata from Python source distributions";
     homepage = https://github.com/0compute/distinfo;

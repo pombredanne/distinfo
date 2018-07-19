@@ -1,4 +1,4 @@
-from distinfo.collectors import Nose
+from distinfo.collectors.nose import Nose
 
 from .cases import TestCase
 
@@ -9,5 +9,5 @@ class TestNose(TestCase):
 
     def test_collect(self, tmpdir):
         tmpdir.join(".noserc").write("x")
-        dist = self._collect(tmpdir)
-        assert {"nose"} == dist.requires.test
+        collector = self._collect(tmpdir)
+        assert {"nose"} == collector.requires.test

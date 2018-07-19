@@ -1,2 +1,0 @@
-class DistInfoException(Exception):
-    pass

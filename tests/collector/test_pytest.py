@@ -1,4 +1,4 @@
-from distinfo.collectors import Pytest
+from distinfo.collectors.pytest import Pytest
 
 from .cases import TestCase
 
@@ -19,20 +19,20 @@ class TestPytest(TestCase):
 
     def test_collect_conftest(self, tmpdir):
         tmpdir.join("conftest.py").write("True")
-        dist = self._collect(tmpdir)
-        assert {"pytest"} == dist.requires.test
+        collector = self._collect(tmpdir)
+        assert {"pytest"} == collector.requires.test
 
     def test_setupcfg(self, tmpdir):
         tmpdir.join("setup.cfg").write(SETUPCFG)
-        dist = self._collect(tmpdir)
-        assert {"pytest"} == dist.requires.test
+        collector = self._collect(tmpdir)
+        assert {"pytest"} == collector.requires.test
 
     def test_setupcfg_cov(self, tmpdir):
         tmpdir.join("setup.cfg").write(SETUPCFG_COV)
-        dist = self._collect(tmpdir)
-        assert {"pytest-cov"} == dist.requires.test
+        collector = self._collect(tmpdir)
+        assert {"pytest-cov"} == collector.requires.test
 
     def test_setupcfg_none(self, tmpdir):
         tmpdir.join("setup.cfg").write("")
-        dist = self._collect(tmpdir)
-        assert not dist.requires
+        collector = self._collect(tmpdir)
+        assert not collector.requires

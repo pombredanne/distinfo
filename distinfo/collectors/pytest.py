@@ -1,5 +1,3 @@
-import subprocess
-
 from .collector import PackageCollector
 
 
@@ -9,7 +7,8 @@ class Pytest(PackageCollector):
 
     def _requires(self):
 
-        config = self.get_setup_cfg()
+        # look for setup.cfg section
+        config = self._get_setup_cfg()
         if config is not None:
             for key in ("pytest", "tool:pytest"):
                 if key in config:
@@ -18,11 +17,7 @@ class Pytest(PackageCollector):
                         return "pytest-cov"
                     return self.name
 
-        conftest = subprocess.check_output((
-            "find",
-            ".",
-            "-name",
-            "conftest.py",
-        )).strip()
+        # look for conftest.py files
+        conftest = list(self.path.glob("**/conftest.py"))
         if conftest:
             return self.name

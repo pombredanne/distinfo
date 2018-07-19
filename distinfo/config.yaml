@@ -1,16 +1,16 @@
-# metadata collectors, order is important as latter depend on former
+# metadata collectors, executed in order
 collectors:
-  # EggInfo must be first as it sets metadata used by the rest
-  - EggInfo
-  - Distutils
+  # DistInfo must be first as the rest depend on it
+  - DistInfo
   - Pep518
   - Pipfile
   - ToxIni
   - RequirementsFile
-  - FindTests
-  - PipReqs
   - Nose
   - Pytest
+  # from here are purely informational
+  - FindTests
+  - PipReqs
 
 # import name => package name
 package_aliases:

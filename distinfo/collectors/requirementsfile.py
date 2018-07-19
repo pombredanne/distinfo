@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from .collector import Collector
 
 
@@ -15,5 +13,5 @@ class RequirementsFile(Collector):
 
     def _collect(self):
         for req in self.TEST_REQUIREMENTS:
-            if Path(req).exists():
-                self.add_requirements_file(req)
+            if (self.path / req).exists():
+                self.add_requirements_file(req, "test")

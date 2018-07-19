@@ -1,4 +1,4 @@
-from distinfo.collectors import Pipfile
+from distinfo.collectors.pipfile import Pipfile
 
 from .cases import TestCase
 
@@ -22,10 +22,11 @@ class TestPipFile(TestCase):
 
     def test_collect(self, tmpdir):
         tmpdir.join("Pipfile").write(PIPFILE)
-        dist = self._collect(tmpdir)
-        assert {"yyy>=1"} == dist.requires.dev
-        assert {"zzz"} == dist.requires.run
+        collector = self._collect(tmpdir)
+        assert {"yyy"} == collector.requires.dev
+        assert {"zzz"} == collector.requires.run
 
-    def test_bad_collect(self, tmpdir):
+    def test_bad_collect(self, caplog, tmpdir):
         tmpdir.join("Pipfile").write("xxx")
         self._collect(tmpdir)
+        assert "raised" in caplog.text

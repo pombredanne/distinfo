@@ -19,23 +19,30 @@ class TestPytest(TestCase):
         requirements = "requirements.txt"
         tmpdir.join(requirements).write("aaa")
         dist = Distribution()
-        collector = Collector(dist, tmpdir)  # pylint: disable=not-callable
+        collector = Collector(dist, tmpdir)
         with sandbox.pushd(tmpdir):
-            collector.add_requirements_file(requirements)
-            collector.add_requirements_file(requirements)
-        assert {"aaa"} == dist.requires.test
+            collector.add_requirements_file(requirements, "run")
+            collector.add_requirements_file(requirements, "run")
+        assert {"aaa"} == dist.requires.run
 
-    def test_package_collector(self, tmpdir):
+    def test_package_collector_run(self, tmpdir):
         dist = Distribution(name="xxx")
         dist.ext.imports = Munch(xxx={XCollector.name})
         dist.ext.packages = ["xxx"]
-        collector = XCollector(dist, tmpdir)  # pylint: disable=not-callable
+        collector = XCollector(dist, tmpdir)
         collector.collect()
-        print(dist.requires)
         assert {XCollector.name} == dist.requires.run
+
+    def test_package_collector_test(self, tmpdir):
+        dist = Distribution(name="xxx")
+        dist.ext.imports = Munch(tests={XCollector.name})
+        dist.ext.packages = ["xxx", "tests"]
+        collector = XCollector(dist, tmpdir)
+        collector.collect()
+        assert {XCollector.name} == dist.requires.test
 
     def test_package_collector_self(self, tmpdir):
         dist = Distribution(name=XCollector.name)
-        collector = XCollector(dist, tmpdir)  # pylint: disable=not-callable
+        collector = XCollector(dist, tmpdir)
         collector.collect()
         assert not dist.requires

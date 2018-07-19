@@ -1,5 +1,4 @@
-from distinfo.collectors import Pep518
-from distinfo.requirement import parse_requirement
+from distinfo.collectors.pep518 import Pep518
 
 from .cases import TestCase
 
@@ -11,6 +10,10 @@ setup()
 PYPROJECT = """
 [build-system]
 requires = ["zzz"]
+
+[tool.flit.metadata]
+requires=["yyy"]
+dev-requires=["xxx"]
 """
 
 
@@ -21,5 +24,7 @@ class TestPep518(TestCase):
     def test_collect(self, tmpdir):
         tmpdir.join("setup.py").write(SETUP)
         tmpdir.join("pyproject.toml").write(PYPROJECT)
-        dist = self._collect(tmpdir, req=parse_requirement(tmpdir))
-        assert {"zzz"} == dist.requires.build
+        collector = self._collect(tmpdir)
+        assert {"zzz"} == collector.requires.build
+        assert {"yyy"} == collector.requires.run
+        assert {"xxx"} == collector.requires.dev

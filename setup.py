@@ -1,4 +1,4 @@
-import pathlib
+from pathlib import Path
 
 from setuptools import setup, find_packages
 
@@ -10,7 +10,7 @@ setup(
     author_email="arthur@0compute.net",
     url="https://github.com/0compute/distinfo",
     description="Extract metadata from Python source distributions",
-    long_description=open(pathlib.Path(__file__).parent / "README.md").read(),
+    long_description=(Path(__file__).parent / "README.md").open().read(),
     long_description_content_type="text/markdown",
     keywords=("packaging", "metadata", "sdist"),
     license="GPL-3.0-or-later",
@@ -37,13 +37,15 @@ setup(
     ),
     install_requires=(
         "appdirs",
+        "capturer",
         "click",
         "coloredlogs",
         "munch",
-        "pip",
+        "packaging",
         "pipreqs",
         "property-manager",
         "ptpython",
+        "pytoml",
         "requirementslib",
         "setuptools",
         "tox",

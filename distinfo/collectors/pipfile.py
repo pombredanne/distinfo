@@ -1,5 +1,4 @@
 import logging
-from pathlib import Path
 
 import requirementslib
 
@@ -16,16 +15,15 @@ class Pipfile(Collector):
     }
 
     def _collect(self):
-        if not Path("Pipfile").exists():
-            return
-        try:
-            pipfile = requirementslib.Pipfile.load(".")
-            sections = pipfile.get_sections()
-            for section, extra in self.EXTRAS.items():
-                packages = sections.get(section) or {}
-                for name, spec in packages.items():
-                    if spec == "*":
-                        spec = ""
-                    self.add_requirement("%s%s" % (name, spec), extra=extra)
-        except Exception as exc:  # pylint: disable=broad-except
-            log.exception("%r: %r", self, exc)
+        if (self.path / "Pipfile").exists():
+            try:
+                pipfile = requirementslib.Pipfile.load(".")
+                sections = pipfile.get_sections()
+                for section, extra in self.EXTRAS.items():
+                    packages = sections.get(section) or {}
+                    for name, spec in packages.items():
+                        if spec == "*":
+                            spec = ""
+                        self.add_requirement("%s%s" % (name, spec), extra)
+            except Exception as exc:  # pylint: disable=broad-except
+                self._warn_exc(exc)

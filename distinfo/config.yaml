@@ -16,6 +16,7 @@ collectors:
 # import name => package name
 package_aliases:
   pkg_resources: setuptools
+  attr: attrs
 
 # logging config
 logging:

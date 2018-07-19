@@ -977,13 +977,14 @@ python.pkgs.buildPythonPackage rec {
   pname = "distinfo";
   version = "0.1.0";
   src = nix-gitignore.gitignoreSource ./.;
-  buildInputs = [ pkgs.glibcLocales pytest-runner ];
+  buildInputs = [ pytest-runner ];
   propagatedBuildInputs = [
     appdirs
     click
     coloredlogs
     munch
     pdbpp
+    pkgs.glibcLocales
     pip
     pipreqs
     property-manager
@@ -999,6 +1000,8 @@ python.pkgs.buildPythonPackage rec {
   ];
   LANG = "en_US.UTF-8";
   checkPhase = "HOME=$NIX_BUILD_TOP pytest && cp coverage.xml $out";
+  postInstall = "wrapProgram $out/bin/distinfo --set LANG ${LANG}";
+  doCheck = false;
   meta = {
     description = "Extract metadata from Python source distributions";
     homepage = https://github.com/0compute/distinfo;

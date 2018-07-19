@@ -10,6 +10,7 @@ collectors:
   - Pytest
   # from here are purely informational
   - FindTests
+  - Git
   - PipReqs
 
 # import name => package name

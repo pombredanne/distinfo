@@ -44,6 +44,8 @@ def main(source_dir, **options):
 
     if options.interactive:
         namespace = dict(
+            Distribution=registry.Distribution,
+            Requirement=registry.Requirement,
             dist=dist,
             dump=util.dump,
             dumps=util.dumps,

@@ -21,10 +21,12 @@ class TestDistInfo(TestCase):
 
     def test_collect(self, tmpdir):
         tmpdir.join("setup.py").write(SETUP)
+        tmpdir.join("xxx").mkdir().join("__init__.py").write("")
         collector = self._collect(tmpdir)
         assert {"setuptools"} == collector.requires.build
         assert {"bbb"} == collector.requires.run
         assert {"ccc", "ddd"} == collector.requires.test
+        assert ["xxx"] == collector.ext.packages
 
     def test_process_output(self, tmpdir):
         collector = self._collect(tmpdir)
@@ -36,10 +38,10 @@ class TestDistInfo(TestCase):
         assert "has no setup.py" in caplog.text
 
     def test_run_dist_info_fail(self, caplog, monkeypatch, tmpdir):
-        def _raiser(name, args):
-            if args == ["dist_info"]:
+        def _raiser(action):
+            if action == "dist_info":
                 raise Exception()
-            return run_setup(name, args)
+            return run_setup(action)
         run_setup = distinfo.run_setup
         monkeypatch.setattr(distinfo, "run_setup", _raiser)
         tmpdir.join("setup.py").write(SETUP)

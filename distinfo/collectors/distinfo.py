@@ -1,4 +1,4 @@
-from distutils.core import run_setup
+import distutils.core
 from email.parser import FeedParser
 import logging
 import re
@@ -7,11 +7,29 @@ import capturer
 
 from munch import Munch
 
+from setuptools import sandbox
+
 from .collector import Collector
 
 log = logging.getLogger(__name__)
 
 SEARCH_PATTERN = re.compile("Searching for (.*)")
+
+SETUP = "setup.py"
+
+
+# run_setup from distutils.core doesn't work in every case - this does
+def run_setup(action):
+    # pylint: disable=protected-access
+    distutils.core._setup_distribution = None
+    with sandbox.save_argv((SETUP, action)):
+        sandbox._execfile(
+            SETUP,
+            dict(__file__=SETUP, __name__="__main__"),
+        )
+    dist = distutils.core._setup_distribution
+    assert dist is not None, "distutils.core.setup not called"
+    return dist
 
 
 class DistInfo(Collector):
@@ -31,30 +49,32 @@ class DistInfo(Collector):
         "supported_platform",
     )
 
-    SETUP = "setup.py"
-
     def _process_output(self, output):
         for req in SEARCH_PATTERN.findall(output):
             self.add_requirement(req, "build")
 
     def _collect(self):
 
-        if not (self.path / self.SETUP).exists():
-            log.warning("%r has no setup.py")
+        if not (self.path / SETUP).exists():
+            log.warning("%r has no %s", self, SETUP)
             return
 
-        with capturer.CaptureOutput(relay=False) as capture:
-            try:
-                dist = run_setup(self.SETUP, ["dist_info"])
-            except BaseException as exc:
-                log.warning("%r dist_info raised %r", self, exc)
+        warnings = []
+        try:
+            with capturer.CaptureOutput(relay=False) as capture:
                 try:
-                    dist = run_setup(self.SETUP, ["egg_info"])
+                    dist = run_setup("dist_info")
                 except BaseException as exc:
-                    log.warning("%r egg_info raised %r", self, exc)
-                    return
-            finally:
-                self._process_output(capture.get_text())
+                    warnings.append("%r dist_info raised %r" % (self, exc))
+                    try:
+                        dist = run_setup("egg_info")
+                    except BaseException as exc:
+                        warnings.append("%r egg_info raised %r" % (self, exc))
+                        return
+        finally:
+            for warning in warnings:
+                log.warning(warning)
+            self._process_output(capture.get_text())
 
         # get metadata
         provides_dist = True

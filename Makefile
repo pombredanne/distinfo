@@ -16,7 +16,15 @@ push: result
 
 .PHONY: test
 test:
-	pytest tests $(ARGS)
+	pytest $(ARGS)
+
+.PHONY: utest
+utest: override ARGS += -k unit
+utest: test
+
+.PHONY: ftest
+ftest: override ARGS += -k functional
+ftest: test
 
 .PHONY: lint
 lint:

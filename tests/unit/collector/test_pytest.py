@@ -1,6 +1,6 @@
 from distinfo.collectors.pytest import Pytest
 
-from .cases import TestCase
+from .cases import Case
 
 SETUPCFG = """
 [tool:pytest]
@@ -13,7 +13,7 @@ addopts = --cov
 """
 
 
-class TestPytest(TestCase):
+class TestPytest(Case):
 
     collector = Pytest
 

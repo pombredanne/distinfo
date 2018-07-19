@@ -1,6 +1,7 @@
+from distinfo import const
 from distinfo.collectors import distinfo
 
-from .cases import TestCase
+from .cases import Case
 
 SETUP = """
 from setuptools import setup
@@ -15,12 +16,12 @@ setup(
 """
 
 
-class TestDistInfo(TestCase):
+class TestDistInfo(Case):
 
     collector = distinfo.DistInfo
 
     def test_collect(self, tmpdir):
-        tmpdir.join("setup.py").write(SETUP)
+        self._write_setup(tmpdir, SETUP)
         tmpdir.join("xxx").mkdir().join("__init__.py").write("")
         collector = self._collect(tmpdir)
         assert {"setuptools"} == collector.requires.build
@@ -30,12 +31,12 @@ class TestDistInfo(TestCase):
 
     def test_process_output(self, tmpdir):
         collector = self._collect(tmpdir)
-        collector._process_output("Searching for xxx")
+        collector._process_output("Searching for xxx")  # pylint: disable=protected-access
         assert collector.requires.build == {"xxx"}
 
-    def test_collect_nosetup(self, tmpdir, caplog):
-        self._collect(tmpdir)
-        assert "has no setup.py" in caplog.text
+    def test_collect_empty(self, caplog, tmpdir):  # pylint: disable=arguments-differ
+        super().test_collect_empty(tmpdir)
+        assert "has no %s" % const.SETUP_PY in caplog.text
 
     def test_run_dist_info_fail(self, caplog, monkeypatch, tmpdir):
         def _raiser(action):
@@ -44,14 +45,14 @@ class TestDistInfo(TestCase):
             return run_setup(action)
         run_setup = distinfo.run_setup
         monkeypatch.setattr(distinfo, "run_setup", _raiser)
-        tmpdir.join("setup.py").write(SETUP)
+        self._write_setup(tmpdir, SETUP)
         collector = self._collect(tmpdir)
         assert "dist_info raised" in caplog.text
         assert collector.name == "UNKNOWN"
 
     def test_run_egg_info_fail(self, caplog, monkeypatch, tmpdir):
         monkeypatch.setattr(distinfo, "run_setup", self._raiser())
-        tmpdir.join("setup.py").write(SETUP)
+        self._write_setup(tmpdir, SETUP)
         collector = self._collect(tmpdir)
         assert "egg_info raised" in caplog.text
         assert collector.name == "UNKNOWN"

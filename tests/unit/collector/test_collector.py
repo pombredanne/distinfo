@@ -5,15 +5,15 @@ from setuptools import sandbox
 from distinfo.distribution import Distribution
 from distinfo.collectors.collector import Collector, PackageCollector
 
-from ..cases import TestCase
+from ..cases import Case
 
 
-class XCollector(PackageCollector):
+class XCollector(PackageCollector):  # pylint: disable=abstract-method
 
     name = "testpkg"
 
 
-class TestPytest(TestCase):
+class TestPytest(Case):
 
     def test_add_requirements_file(self, tmpdir):
         requirements = "requirements.txt"

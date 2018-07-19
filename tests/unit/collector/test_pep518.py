@@ -1,11 +1,6 @@
 from distinfo.collectors.pep518 import Pep518
 
-from .cases import TestCase
-
-SETUP = """
-from setuptools import setup
-setup()
-"""
+from .cases import Case
 
 PYPROJECT = """
 [build-system]
@@ -17,12 +12,12 @@ dev-requires=["xxx"]
 """
 
 
-class TestPep518(TestCase):
+class TestPep518(Case):
 
     collector = Pep518
 
     def test_collect(self, tmpdir):
-        tmpdir.join("setup.py").write(SETUP)
+        self._write_setup(tmpdir)
         tmpdir.join("pyproject.toml").write(PYPROJECT)
         collector = self._collect(tmpdir)
         assert {"zzz"} == collector.requires.build

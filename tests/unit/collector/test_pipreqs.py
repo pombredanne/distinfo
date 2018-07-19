@@ -2,7 +2,7 @@ from pipreqs import pipreqs
 
 from distinfo.collectors.pipreqs import PipReqs
 
-from .cases import TestCase
+from .cases import Case
 
 PACKAGE = """
 import aaa
@@ -15,7 +15,7 @@ import bbb
 """
 
 
-class TestPipReqs(TestCase):
+class TestPipReqs(Case):
 
     collector = PipReqs
 
@@ -35,7 +35,7 @@ class TestPipReqs(TestCase):
         assert "missing test dependencies" in caplog.text
 
     def test_collect_empty(self, tmpdir):
-        collector = self._collect(tmpdir)
+        collector = super().test_collect_empty(tmpdir)
         assert not hasattr(collector.ext, "imports")
 
     def test_collect_fail(self, monkeypatch, tmpdir):

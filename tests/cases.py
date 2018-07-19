@@ -1,8 +1,14 @@
 from pathlib import Path
-import shutil
+
+from distinfo import const
+
+SETUP = """
+from setuptools import setup
+setup()
+"""
 
 
-class TestCase:
+class Case:
 
     DIST = "test.dist"
 
@@ -13,7 +19,5 @@ class TestCase:
             raise exc()
         return _raiser
 
-    def _sdist(self, tmpdir):
-        sdist = Path(tmpdir) / "src"
-        shutil.copytree(self.data_path / self.DIST, sdist)
-        return sdist
+    def _write_setup(self, tmpdir, setup=SETUP):
+        tmpdir.join(const.SETUP_PY).write(setup)

@@ -36,7 +36,11 @@ class Distribution(Base, wrapt.ObjectProxy):
 
     @property
     def name(self):
-        return getattr(self, "name", "UNKNOWN")
+        return self.get("name", "UNKNOWN")
+
+    @name.setter
+    def name(self, name):
+        self["name"] = name
 
     @classmethod
     def from_source(cls, source_dir):
@@ -47,14 +51,16 @@ class Distribution(Base, wrapt.ObjectProxy):
                 "distinfo.collectors.%s" % name.lower()
             )
             getattr(module, name)(dist, req.path).collect()
-        assert dist.name != "UNKNOWN", "Metadata unavailable"
-        # XXX: a side effect of the below is that `requires` will remove any
-        # invalid requirements
-        log.debug(
-            "%r requires:\n%s",
-            dist,
-            util.dumps(dist.requires, fmt="yamls"),
-        )
+        if dist.name == "UNKNOWN":
+            log.warning("%r metadata unavailable")
+        else:
+            # XXX: a side effect of the below is that `requires` will remove
+            # any invalid requirements
+            log.debug(
+                "%r requires:\n%s",
+                dist,
+                util.dumps(dist.requires, fmt="yamls"),
+            )
         return dist
 
     @property

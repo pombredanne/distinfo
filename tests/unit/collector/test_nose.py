@@ -1,9 +1,9 @@
 from distinfo.collectors.nose import Nose
 
-from .cases import TestCase
+from .cases import Case
 
 
-class TestNose(TestCase):
+class TestNose(Case):
 
     collector = Nose
 

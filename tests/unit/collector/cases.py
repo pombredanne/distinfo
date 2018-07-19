@@ -1,9 +1,9 @@
 from distinfo.distribution import Distribution
 
-from ..cases import TestCase as _TestCase
+from ..cases import Case as _Case
 
 
-class TestCase(_TestCase):
+class Case(_Case):
 
     collector = None
 
@@ -16,4 +16,9 @@ class TestCase(_TestCase):
         dist.ext.update(kwargs)
         collector = self.collector(dist, source_dir)  # pylint: disable=not-callable
         collector.collect()
+        return collector
+
+    def test_collect_empty(self, tmpdir):
+        collector = self._collect(tmpdir)
+        assert not collector.requires
         return collector

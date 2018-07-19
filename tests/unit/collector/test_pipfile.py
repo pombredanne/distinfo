@@ -1,6 +1,6 @@
 from distinfo.collectors.pipfile import Pipfile
 
-from .cases import TestCase
+from .cases import Case
 
 PIPFILE = """
 [[source]]
@@ -16,7 +16,7 @@ name = "pypi"
 """
 
 
-class TestPipFile(TestCase):
+class TestPipFile(Case):
 
     collector = Pipfile
 

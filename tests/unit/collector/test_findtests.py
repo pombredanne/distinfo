@@ -1,9 +1,9 @@
 from distinfo.collectors.findtests import FindTests
 
-from .cases import TestCase
+from .cases import Case
 
 
-class TestFindTests(TestCase):
+class TestFindTests(Case):
 
     collector = FindTests
 
@@ -12,6 +12,6 @@ class TestFindTests(TestCase):
         collector = self._collect(tmpdir)
         assert collector.ext.tests
 
-    def test_collect_false(self, tmpdir):
-        collector = self._collect(tmpdir)
+    def test_collect_empty(self, tmpdir):
+        collector = super().test_collect_empty(tmpdir)
         assert not hasattr(collector.ext, "tests")

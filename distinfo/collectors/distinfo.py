@@ -9,23 +9,22 @@ from munch import Munch
 
 from setuptools import sandbox
 
+from .. import const
 from .collector import Collector
 
 log = logging.getLogger(__name__)
 
 SEARCH_PATTERN = re.compile("Searching for (.*)")
 
-SETUP = "setup.py"
-
 
 # run_setup from distutils.core doesn't work in every case - this does
 def run_setup(action):
     # pylint: disable=protected-access
     distutils.core._setup_distribution = None
-    with sandbox.save_argv((SETUP, action)):
+    with sandbox.save_argv((const.SETUP_PY, action)):
         sandbox._execfile(
-            SETUP,
-            dict(__file__=SETUP, __name__="__main__"),
+            const.SETUP_PY,
+            dict(__file__=const.SETUP_PY, __name__="__main__"),
         )
     dist = distutils.core._setup_distribution
     assert dist is not None, "distutils.core.setup not called"
@@ -55,8 +54,8 @@ class DistInfo(Collector):
 
     def _collect(self):
 
-        if not (self.path / SETUP).exists():
-            log.warning("%r has no %s", self, SETUP)
+        if not (self.path / const.SETUP_PY).exists():
+            log.warning("%r has no %s", self, const.SETUP_PY)
             return
 
         warnings = []

@@ -4,16 +4,17 @@ import pytest
 
 from distinfo import util
 
-from .cases import TestCase
+from .cases import Case
 
 
-class TestUtil(TestCase):
+class TestUtil(Case):
 
-    @pytest.mark.parametrize("fmt", util.DUMPERS.keys())
+    @pytest.mark.parametrize("fmt", list(util.DUMPERS.keys()) + [None])
     def test_dump(self, fmt):
         obj = dict(
             one=set(),
             two=2,
+            three=dict(x=1),
         )
         stream = io.StringIO()
         util.dump(obj, fmt=fmt, file=stream)

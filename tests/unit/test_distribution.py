@@ -1,10 +1,27 @@
+import importlib
+
+from distinfo import config
 from distinfo.distribution import Distribution
 from distinfo.requirement import Requirement
 
-from .cases import TestCase
+from .cases import Case
 
 
-class TestDistribution(TestCase):
+class DummyCollector:
+
+    def __init__(self, dist, _source_dir):
+        self.dist = dist
+
+    def collect(self):
+        self.dist.name = "xxx"
+
+
+class DummyModule:
+
+    DummyCollector = DummyCollector
+
+
+class TestDistribution(Case):
 
     def test_repr(self):
         dist = Distribution()
@@ -66,8 +83,16 @@ class TestDistribution(TestCase):
         assert not hasattr(dist.requires, "yyy")
         assert "InvalidRequirement" in caplog.text
 
-    def test_from_source(self, tmpdir):
-        sdist = self._sdist(tmpdir)
-        dist = Distribution.from_source(sdist)
-        assert dist.name == "test.dist"
-        assert dist.requires.run == {"xxx"}
+    def test_from_source_dummy_collect(self, monkeypatch, tmpdir):
+        monkeypatch.setitem(config.cfg, "collectors", ["DummyCollector"])
+        monkeypatch.setattr(importlib, "import_module", lambda _x: DummyModule())
+        self._write_setup(tmpdir)
+        dist = Distribution.from_source(tmpdir)
+        assert dist.name == "xxx"
+
+    def test_from_source_no_collect(self, caplog, monkeypatch, tmpdir):
+        monkeypatch.setitem(config.cfg, "collectors", [])
+        self._write_setup(tmpdir)
+        dist = Distribution.from_source(tmpdir)
+        assert dist.name == "UNKNOWN"
+        assert "metadata unavailable" in caplog.text

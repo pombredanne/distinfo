@@ -4,10 +4,10 @@ from click.testing import CliRunner
 
 from distinfo import cli
 
-from .cases import TestCase
+from .cases import Case
 
 
-class TestCli(TestCase):
+class TestCli(Case):
 
     def _invoke(self, tmpdir, *args, **kwargs):
         exit_code = kwargs.pop("exit_code", 0)

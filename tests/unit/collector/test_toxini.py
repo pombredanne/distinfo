@@ -5,7 +5,7 @@ from tox.exception import ConfigError
 from distinfo.collectors import toxini
 from distinfo.requirement import Requirement
 
-from .cases import TestCase
+from .cases import Case
 
 TOXINI = """
 [tox]
@@ -37,7 +37,7 @@ envlist = xxx
 """
 
 
-class TestRequirementsFile(TestCase):
+class TestRequirementsFile(Case):
 
     collector = toxini.ToxIni
 

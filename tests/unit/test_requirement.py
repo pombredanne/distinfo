@@ -1,9 +1,9 @@
 from distinfo.requirement import Requirement
 
-from .cases import TestCase
+from .cases import Case
 
 
-class TestRequirement(TestCase):
+class TestRequirement(Case):
 
     def test_repr(self):
         req = Requirement("xxx")

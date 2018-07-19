@@ -1,9 +1,9 @@
 from distinfo.collectors.requirementsfile import RequirementsFile
 
-from .cases import TestCase
+from .cases import Case
 
 
-class TestRequirementsFile(TestCase):
+class TestRequirementsFile(Case):
 
     collector = RequirementsFile
 

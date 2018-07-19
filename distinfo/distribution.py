@@ -53,7 +53,7 @@ class Distribution(Base, wrapt.ObjectProxy):
         log.debug(
             "%r requires:\n%s",
             dist,
-            util.dump(dist.requires, fmt="yamls"),
+            util.dumps(dist.requires, fmt="yamls"),
         )
         return dist
 

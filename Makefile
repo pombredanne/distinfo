@@ -14,8 +14,12 @@ result:
 push: result
 	cachix push distinfo $<
 
+EGG_INFO = distinfo.egg-info
+$(EGG_INFO):
+	python setup.py egg_info
+
 .PHONY: test
-test:
+test: $(EGG_INFO)
 	pytest $(ARGS)
 
 .PHONY: utest

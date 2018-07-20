@@ -10,6 +10,7 @@
 /.htmlcov/
 /.no-nix
 /.pytest_cache/
+/build/
 /coverage.xml
 /dist/
 /result

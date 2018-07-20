@@ -43,7 +43,7 @@ class Collector(Base):
 
     def collect(self):
         with sandbox.pushd(self.source_dir), sandbox.save_path():
-            sys.path.insert(0, self.source_dir)
+            sys.path.insert(0, ".")
             self._collect()
         self._clean_dict(self.ext)
 

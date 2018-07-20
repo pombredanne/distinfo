@@ -700,10 +700,10 @@ with rec {
 
   requirementslib = python.pkgs.buildPythonPackage rec {
     pname = "requirementslib";
-    version = "1.0.10";
+    version = "1.0.11";
     src = python.pkgs.fetchPypi {
       inherit pname version;
-      sha256 = "f4c2dfd12d5faf9e4220baaedc079780cc307d1aa41991fa0906c2f13df197f9";
+      sha256 = "87cd1197cc4b880d710eacbc4fb11fd0564187a1d965382e66cbaa2a1b08744f";
     };
     propagatedBuildInputs = [
       attrs

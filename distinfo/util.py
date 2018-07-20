@@ -7,10 +7,12 @@ from munch import unmunchify
 import yaml
 
 DUMPERS = dict(
-    json=partial(json.dumps, default=str, sort_keys=True, indent=2),
+    json=partial(json.dumps, default=str, sort_keys=True),
     yaml=partial(yaml.dump, default_flow_style=False),
     yamls=yaml.dump,
 )
+
+DEFAULT_DUMPER = "json"
 
 
 def _todict(obj):
@@ -27,9 +29,7 @@ def _todict(obj):
     return unmunchify(result)
 
 
-def dumps(obj, fmt=None, **kwargs):
-    if fmt is None:
-        fmt = "json"
+def dumps(obj, fmt=DEFAULT_DUMPER, **kwargs):
     return DUMPERS[fmt](_todict(obj), **kwargs).strip()
 
 

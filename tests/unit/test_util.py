@@ -9,7 +9,7 @@ from .cases import Case
 
 class TestUtil(Case):
 
-    @pytest.mark.parametrize("fmt", list(util.DUMPERS.keys()) + [None])
+    @pytest.mark.parametrize("fmt", list(util.DUMPERS.keys()))
     def test_dump(self, fmt):
         obj = dict(
             one=set(),

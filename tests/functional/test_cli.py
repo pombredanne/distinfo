@@ -36,7 +36,7 @@ class TestCli(Case):
 
     def test_main_extract_write(self, tmpdir):
         out = tmpdir.join("out.json")
-        self._invoke(tmpdir, "-o", out)
+        self._invoke(tmpdir, "-p", "-o", out)
         dist = json.load(open(out))
         assert dist["name"] == "test.dist"
 

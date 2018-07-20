@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="distinfo",
-    version="0.1.0",
+    version="0.2.0.dev",
     author="Arthur Noel",
     author_email="arthur@0compute.net",
     url="https://github.com/0compute/distinfo",

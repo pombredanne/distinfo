@@ -30,6 +30,8 @@ log = logging.getLogger(__name__)
 @click.option("-f", "--fmt", type=click.Choice(util.DUMPERS.keys()),
               help="Output formats")
 @click.option("-r", "--requires", is_flag=True, help="Print requires")
+@click.option("--include", help="Include metadata keys")
+@click.option("--exclude", help="Exclude metadata keys")
 @click.version_option(VERSION)
 def main(source_dir, **options):
     """
@@ -65,6 +67,10 @@ def main(source_dir, **options):
             obj = dist.requires
         else:
             obj = dist.metadata
+            if options.include:
+                obj = {k: v for k, v in obj.items() if k in options.include.split(",")}
+            if options.exclude:
+                obj = {k: v for k, v in obj.items() if k not in options.exclude.split(",")}
         dump = util.dumps(obj, fmt=options.fmt)
         if options.output:
             with open(options.output, "w") as stream:

@@ -40,6 +40,12 @@ class TestCli(Case):
         dist = json.load(open(out))
         assert dist["name"] == "test.dist"
 
+    def test_main_extract_write_include_exclude(self, tmpdir):
+        out = tmpdir.join("out.json")
+        self._invoke(tmpdir, "-o", out, "--include=name", "--exclude=name")
+        dist = json.load(open(out))
+        assert not dist
+
     def test_main_requires(self, tmpdir):
         result = self._invoke(tmpdir, "-r")
         print(result.output)

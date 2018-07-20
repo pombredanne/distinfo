@@ -11,6 +11,10 @@ log = logging.getLogger(__name__)
 
 class Requirement(Base, _Requirement):
 
+    def __init__(self, requirement_string):
+        super().__init__(requirement_string)
+        self.requirement_string = requirement_string
+
     def __hash__(self):
         # HACK: used by set __contains__
         return hash(self.name.lower())

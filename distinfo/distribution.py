@@ -83,16 +83,13 @@ class Distribution(Base, wrapt.ObjectProxy):
     @property
     def reqs(self):
         reqs = set()
-        for req_str in self.requires_dist:
+        for req in self.requires_dist:
             try:
-                req = Requirement(req_str)
+                req = Requirement(req)
             except InvalidRequirement as exc:
-                log.warning("%r requirement %r raised: %r", self, req_str, exc)
-                self.requires_dist.remove(req_str)
+                log.warning("%r requirement %r raised: %r", self, req, exc)
+                self.requires_dist.remove(req)
             else:
-                # keep the requirement string which may be needed later to
-                # remove it from `requires_dist`
-                req.req_str = req_str
                 reqs.add(req)
         return reqs
 
@@ -127,7 +124,7 @@ class Distribution(Base, wrapt.ObjectProxy):
     def _add_requirement(self, req, old=None):
         if old is not None:
             log.debug("%r replacing %r with %r", self, old, req)
-            self.requires_dist.remove(old.req_str)
+            self.remove_requirement(old)
         self.requires_dist.add(str(req))
         del self.requires
         return req
@@ -168,3 +165,6 @@ class Distribution(Base, wrapt.ObjectProxy):
             req.marker = marker
 
         return self._add_requirement(req)
+
+    def remove_requirement(self, req):
+        self.requires_dist.remove(req.requirement_string)

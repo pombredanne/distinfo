@@ -39,7 +39,7 @@ Print dependencies and metadata:
     "pytest",
   ]
 }
->>> print(dist.metadata)
+>>> dump(dist.metadata)
 {
   "author": "A N Other",
   "author_email": "a@example.org",

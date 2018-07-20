@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from distinfo import const
 
 SETUP = """
@@ -11,8 +9,6 @@ setup()
 class Case:
 
     DIST = "test.dist"
-
-    data_path = Path(__file__).parent / "data"
 
     def _raiser(self, exc=Exception):
         def _raiser(*_args, **_kwargs):

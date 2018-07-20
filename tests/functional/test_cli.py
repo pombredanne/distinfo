@@ -6,15 +6,23 @@ from distinfo import cli
 
 from .cases import Case
 
+SETUP = """
+from setuptools import setup
+setup(
+    name="test.dist",
+    install_requires=["xxx"],
+)
+"""
+
 
 class TestCli(Case):
 
     def _invoke(self, tmpdir, *args, **kwargs):
         exit_code = kwargs.pop("exit_code", 0)
         kwargs.setdefault("catch_exceptions", False)
-        sdist = self._sdist(tmpdir)
+        self._write_setup(tmpdir, SETUP)
         runner = CliRunner()
-        result = runner.invoke(cli.main, map(str, args + (sdist,)), **kwargs)
+        result = runner.invoke(cli.main, map(str, args + (tmpdir,)), **kwargs)
         assert result.exit_code == exit_code
         return result
 

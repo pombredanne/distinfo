@@ -74,7 +74,7 @@ travis-install: $(CC_REPORTER)
 travis-success: push
 	cp result/coverage.xml .
 	cc-test-reporter after-build
-	pip install codacy-coverage
+	sudo pip install codacy-coverage
 	python-codacy-coverage -r coverage.xml
 
 endif

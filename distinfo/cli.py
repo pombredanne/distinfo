@@ -64,7 +64,7 @@ def main(source_dir, **options):
         if options.requires:
             obj = dist.requires
         else:
-            obj = dist
+            obj = dist.metadata
         dump = util.dumps(obj, fmt=options.fmt)
         if options.output:
             with open(options.output, "w") as stream:

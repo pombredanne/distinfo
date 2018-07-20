@@ -27,8 +27,8 @@ class Distribution(Base):
         self.metadata = Munch(
             name="UNKNOWN",
             version="0.0.0",
-            requires_dist=set(),
             provides_extra=set(),
+            requires_dist=set(),
             extensions=Munch(distinfo=Munch()),
         )
         self.metadata.update(kwargs)
@@ -49,9 +49,6 @@ class Distribution(Base):
             util.dumps(self.requires, fmt="yamls"),
         )
 
-    def __getattr__(self, key):
-        return getattr(self.metadata, key)
-
     def __str__(self):
         return "%s-%s%s" % (
             self.name,
@@ -60,8 +57,28 @@ class Distribution(Base):
         )
 
     @property
+    def name(self):
+        return self.metadata.name
+
+    @name.setter
+    def name(self, name):
+        self.metadata.name = name
+
+    @property
+    def version(self):
+        return self.metadata.version
+
+    @property
+    def provides_extra(self):
+        return self.metadata.provides_extra
+
+    @property
+    def requires_dist(self):
+        return self.metadata.requires_dist
+
+    @property
     def ext(self):
-        return self.extensions.distinfo
+        return self.metadata.extensions.distinfo
 
     def _filter_reqs(self, reqs, extra):
         filtered = set()

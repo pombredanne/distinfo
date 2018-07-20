@@ -25,5 +25,5 @@ class Pipfile(Collector):
                         if spec == "*":
                             spec = ""
                         self.add_requirement("%s%s" % (name, spec), extra)
-            except Exception as exc:  # pylint: disable=broad-except
+            except Exception as exc:
                 self._warn_exc(exc)

@@ -31,7 +31,7 @@ class TestDistInfo(Case):
 
     def test_process_output(self, tmpdir):
         collector = self._collect(tmpdir)
-        collector._process_output("Searching for xxx")  # pylint: disable=protected-access
+        collector._process_output("Searching for xxx")
         assert collector.requires.build == {"xxx"}
 
     def test_collect_empty(self, caplog, tmpdir):  # pylint: disable=arguments-differ

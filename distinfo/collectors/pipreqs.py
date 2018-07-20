@@ -30,7 +30,7 @@ class PipReqs(Collector):
                     )
                 )
             )
-        except Exception as exc:  # pylint: disable=broad-except
+        except Exception as exc:
             self._warn_exc(exc)
             return set()
 

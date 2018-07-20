@@ -19,7 +19,6 @@ SEARCH_PATTERN = re.compile("Searching for (.*)")
 
 # run_setup from distutils.core doesn't work in every case - this does
 def run_setup(action):
-    # pylint: disable=protected-access
     distutils.core._setup_distribution = None
     with sandbox.save_argv((const.SETUP_PY, action)):
         sandbox._execfile(

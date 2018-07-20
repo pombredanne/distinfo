@@ -1,14 +1,16 @@
 import importlib
 import logging
+import os
+import sys
 
-from munch import Munch
+from munch import DefaultMunch, Munch
 
 from packaging.markers import InvalidMarker, Marker
 from packaging.requirements import InvalidRequirement
 
 from property_manager import cached_property
 
-from requirementslib.models.requirements import FileRequirement
+from setuptools import sandbox
 
 import wrapt
 
@@ -22,7 +24,9 @@ log = logging.getLogger(__name__)
 
 class Distribution(Base, wrapt.ObjectProxy):
 
-    def __init__(self, **kwargs):
+    path = None
+
+    def __init__(self, path=None, **kwargs):
         metadata = Munch(
             requires_dist=set(),
             provides_extra=set(),
@@ -30,9 +34,30 @@ class Distribution(Base, wrapt.ObjectProxy):
         )
         metadata.update(kwargs)
         super().__init__(metadata)
+        self.path = path
+        if self.path is not None:
+            self.path = os.path.relpath(self.path)
+            with sandbox.pushd(self.path), sandbox.save_path():
+                sys.path.insert(0, ".")
+                for name in cfg.collectors:
+                    module = importlib.import_module(
+                        "distinfo.collectors.%s" % name.lower()
+                    )
+                    getattr(module, name)(self).collect()
+        # XXX: a side effect of the below is that `requires` will remove
+        # any invalid requirements
+        log.debug(
+            "%r requires:\n%s",
+            self,
+            util.dumps(self.requires, fmt="yamls"),
+        )
 
     def __str__(self):
-        return "%s-%s" % (self.name, self.version)
+        return "%s-%s%s" % (
+            self.name,
+            self.version,
+            self.path and " %s" % self.path or "",
+        )
 
     @property
     def name(self):
@@ -50,36 +75,15 @@ class Distribution(Base, wrapt.ObjectProxy):
     def version(self, version):
         self["version"] = version
 
-    @classmethod
-    def from_source(cls, source_dir):
-        req = FileRequirement.from_line(str(source_dir))
-        dist = cls()
-        for name in cfg.collectors:
-            module = importlib.import_module(
-                "distinfo.collectors.%s" % name.lower()
-            )
-            getattr(module, name)(dist, req.path).collect()
-        if dist.name == "UNKNOWN":
-            log.warning("%r metadata unavailable")
-        else:
-            # XXX: a side effect of the below is that `requires` will remove
-            # any invalid requirements
-            log.debug(
-                "%r requires:\n%s",
-                dist,
-                util.dumps(dist.requires, fmt="yamls"),
-            )
-        return dist
-
     @property
     def ext(self):
         return self.extensions.distinfo
 
-    def _filter_reqs(self, reqs, extra=None):
+    def _filter_reqs(self, reqs, extra):
         filtered = set()
         env = dict(extra=extra)
         for req in reqs:
-            if extra is None:
+            if extra == "run":
                 if req.marker is None or req.marker.evaluate(env):
                     filtered.add(req)
             else:
@@ -87,8 +91,8 @@ class Distribution(Base, wrapt.ObjectProxy):
                     filtered.add(req)
         return filtered
 
-    @property
-    def reqs(self):
+    @cached_property
+    def requires(self):
         reqs = set()
         for req in self.requires_dist:
             try:
@@ -98,43 +102,16 @@ class Distribution(Base, wrapt.ObjectProxy):
                 self.requires_dist.remove(req)
             else:
                 reqs.add(req)
-        return reqs
-
-    @cached_property
-    def requires(self):
-        requires = Munch()
-        reqs = self.reqs
-        run = self._filter_reqs(reqs)
+        requires = DefaultMunch(set())
+        run = self._filter_reqs(reqs, "run")
         if run:
             requires["run"] = run
             reqs -= run
         for extra in self.provides_extra:
-            # set the marker to None as it has already served its purpose and
-            # now is just noise
-            filtered = set(map(lambda r: setattr(r, "marker", None) or r,
-                               self._filter_reqs(reqs, extra=extra)))
-            if filtered:
-                requires[extra] = filtered
+            ereqs = self._filter_reqs(reqs, extra)
+            if ereqs:
+                requires[extra] = ereqs
         return requires
-
-    def _merge_requirement(self, mreq, extra):
-        for req in self.requires.get(extra, []):
-            if mreq.name == req.name:
-                mreq.specifier &= req.specifier
-                if req.marker is not None:
-                    if mreq.marker is None:
-                        mreq.marker = req.marker
-                    else:
-                        mreq.marker = Marker("(%s) and %s" % (req.marker, mreq.marker))
-                return mreq, req
-
-    def _add_requirement(self, req, old=None):
-        if old is not None:
-            log.debug("%r replacing %r with %r", self, old, req)
-            self.remove_requirement(old)
-        self.requires_dist.add(str(req))
-        del self.requires
-        return req
 
     def add_requirement(self, req, extra="run"):
 
@@ -149,16 +126,12 @@ class Distribution(Base, wrapt.ObjectProxy):
             # belt and braces
             assert isinstance(req, Requirement)
 
-        # try to merge with existing
-        mreq = self._merge_requirement(req, extra)
-        if mreq is not None:
-            return self._add_requirement(*mreq)
+        # skip out if requirement is already present
+        if req in self.requires[extra] \
+                or (extra != "run" and req in self.requires["run"]):
+            return
 
         if extra != "run":
-            # try to merge with existing in "run"
-            mreq = self._merge_requirement(req, "run")
-            if mreq is not None:
-                return self._add_requirement(*mreq)
             self.provides_extra.add(extra)
             # set marker
             try:
@@ -171,7 +144,6 @@ class Distribution(Base, wrapt.ObjectProxy):
                 marker = Marker("(%s) and %s" % (req.marker, marker))
             req.marker = marker
 
-        return self._add_requirement(req)
-
-    def remove_requirement(self, req):
-        self.requires_dist.remove(req.requirement_string)
+        self.requires_dist.add(str(req))
+        del self.requires
+        return req

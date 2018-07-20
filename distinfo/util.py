@@ -18,8 +18,11 @@ def _todict(obj):
     for key, value in obj.items():
         if isinstance(value, dict):
             value = _todict(value)
-        if isinstance(value, set):
-            value = sorted(map(str, value), key=str.lower)
+        elif isinstance(value, set):
+            value = sorted(map(
+                lambda v: v.__dump__() if hasattr(v, "__dump__") else str(v),
+                value
+            ), key=str.lower)
         result[key] = value
     return unmunchify(result)
 

@@ -1,9 +1,6 @@
 import configparser
 import logging
 from pathlib import Path
-import sys
-
-from setuptools import sandbox
 
 from ..base import Base
 from ..requirement import Requirement
@@ -13,11 +10,10 @@ log = logging.getLogger(__name__)
 
 class Collector(Base):
 
-    def __init__(self, dist, source_dir):
+    def __init__(self, dist):
         self.dist = dist
-        self.source_dir = source_dir
-        self._seen_files = set()
         self.path = Path()
+        self._seen_files = set()
 
     def __getattr__(self, key):
         return getattr(self.dist, key)
@@ -42,14 +38,14 @@ class Collector(Base):
             del obj[key]
 
     def collect(self):
-        with sandbox.pushd(self.source_dir), sandbox.save_path():
-            sys.path.insert(0, ".")
-            self._collect()
+        assert self.path is not None
+        self._collect()
         self._clean_dict(self.ext)
 
     def add_requirement(self, req, extra):
-        log.debug("%r %r add %r", self, extra, req)
-        self.dist.add_requirement(req, extra=extra)
+        req = self.dist.add_requirement(req, extra=extra)
+        if req is not None:
+            log.debug("%r %r add %r", self, extra, req)
 
     def add_requirements_file(self, path, extra):
         if path in self._seen_files:
@@ -75,7 +71,7 @@ class PackageCollector(Collector):
         raise NotImplementedError()
 
     def _collect(self):
-        if getattr(self.dist, "name", None) == self.name:
+        if self.dist.name == self.name:
             return
         # check imports for the package name
         req = False

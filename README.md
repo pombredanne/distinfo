@@ -22,7 +22,7 @@ Print dependencies and metadata:
 ``` python
 >>> from distinfo import Distribution, dump
 >>>
->>> dist = Distribution.from_source(".")
+>>> dist = Distribution(".")
 >>> dump(dist.requires)
 {
   "build": [

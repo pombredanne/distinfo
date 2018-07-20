@@ -32,8 +32,8 @@ class TestCli(Case):
         dist = json.load(open(out))
         assert dist["name"] == "test.dist"
 
-    def test_main_depends(self, tmpdir):
-        result = self._invoke(tmpdir, "-d")
+    def test_main_requires(self, tmpdir):
+        result = self._invoke(tmpdir, "-r")
         print(result.output)
         # dist = json.loads(result.output)
         # assert dist["name"] == "test.dist"

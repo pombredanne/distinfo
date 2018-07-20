@@ -33,6 +33,9 @@ class Requirement(Base, _Requirement):
                 return True
         return False
 
+    def __dump__(self):
+        return str(self).split(";")[0]
+
     @classmethod
     def parse(cls, line):
         return cls(XRequirement.from_line(line).as_line())

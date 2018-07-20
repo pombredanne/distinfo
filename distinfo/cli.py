@@ -29,7 +29,7 @@ log = logging.getLogger(__name__)
 @click.option("-c", "--color", is_flag=True, help="Force colored output")
 @click.option("-f", "--fmt", type=click.Choice(util.DUMPERS.keys()),
               help="Output formats")
-@click.option("-d", "--depends", is_flag=True, help="Print dependencies")
+@click.option("-r", "--requires", is_flag=True, help="Print requires")
 @click.version_option(VERSION)
 def main(source_dir, **options):
     """
@@ -42,7 +42,7 @@ def main(source_dir, **options):
         cfg.logging.config.isatty = True
     configure_logging()
 
-    dist = Distribution.from_source(source_dir)
+    dist = Distribution(source_dir)
 
     if options.interactive:
         namespace = dict(
@@ -61,7 +61,7 @@ def main(source_dir, **options):
             history_filename=cachedir / "history",
         )
     else:
-        if options.depends:
+        if options.requires:
             obj = dist.requires
         else:
             obj = dist

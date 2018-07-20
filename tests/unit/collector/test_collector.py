@@ -19,30 +19,30 @@ class TestPytest(Case):
         requirements = "requirements.txt"
         tmpdir.join(requirements).write("aaa")
         dist = Distribution()
-        collector = Collector(dist, tmpdir)
+        collector = Collector(dist)
         with sandbox.pushd(tmpdir):
             collector.add_requirements_file(requirements, "run")
             collector.add_requirements_file(requirements, "run")
         assert {"aaa"} == dist.requires.run
 
-    def test_package_collector_run(self, tmpdir):
+    def test_package_collector_run(self):
         dist = Distribution(name="xxx")
         dist.ext.imports = Munch(xxx={XCollector.name})
         dist.ext.packages = ["xxx"]
-        collector = XCollector(dist, tmpdir)
+        collector = XCollector(dist)
         collector.collect()
         assert {XCollector.name} == dist.requires.run
 
-    def test_package_collector_test(self, tmpdir):
+    def test_package_collector_test(self):
         dist = Distribution(name="xxx")
         dist.ext.imports = Munch(tests={XCollector.name})
         dist.ext.packages = ["xxx", "tests"]
-        collector = XCollector(dist, tmpdir)
+        collector = XCollector(dist)
         collector.collect()
         assert {XCollector.name} == dist.requires.test
 
-    def test_package_collector_self(self, tmpdir):
+    def test_package_collector_self(self):
         dist = Distribution(name=XCollector.name)
-        collector = XCollector(dist, tmpdir)
+        collector = XCollector(dist)
         collector.collect()
         assert not dist.requires

@@ -19,7 +19,7 @@ class TestPipReqs(Case):
 
     collector = PipReqs
 
-    def test_collect(self, caplog, tmpdir):
+    def test_collect(self, tmpdir):
         tmpdir.join("xxx").mkdir().join("__init__.py") .write(PACKAGE)
         tmpdir.join("tests").mkdir().join("__init__.py") .write(TESTS)
         collector = self._collect(
@@ -31,8 +31,6 @@ class TestPipReqs(Case):
         )
         assert collector.ext.imports.xxx == {"aaa", "ccc"}
         assert collector.ext.imports.tests == {"bbb"}
-        assert "missing run dependencies" in caplog.text
-        assert "missing test dependencies" in caplog.text
 
     def test_collect_empty(self, tmpdir):
         collector = super().test_collect_empty(tmpdir)

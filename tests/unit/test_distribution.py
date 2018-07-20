@@ -9,7 +9,7 @@ from .cases import Case
 
 class DummyCollector:
 
-    def __init__(self, dist, _source_dir):
+    def __init__(self, dist):
         self.dist = dist
 
     def collect(self):
@@ -27,6 +27,18 @@ class TestDistribution(Case):
         dist = Distribution()
         assert "Distribution" in repr(dist)
 
+    def test_name(self):
+        dist = Distribution()
+        assert dist.name == "UNKNOWN"
+        dist.name = "xxx"
+        assert dist.name == "xxx"
+
+    def test_version(self):
+        dist = Distribution()
+        assert dist.version == "0.0.0"
+        dist.version = "1.0.0"
+        assert dist.version == "1.0.0"
+
     def test_add_requirement(self):
         dist = Distribution()
         dist.add_requirement("xxx")
@@ -34,31 +46,11 @@ class TestDistribution(Case):
         assert {"xxx"} == dist.requires.run
         dist.add_requirement("xxx", extra="test")
         assert {"xxx"} == dist.requires.run
-        assert not hasattr(dist.requires, "test")
+        assert not dist.requires.test
         dist.add_requirement("yyy", extra="test")
         assert {"yyy"} == dist.requires.test
-
-    def test_add_requirement_merge_specifiers(self):
-        dist = Distribution()
-        dist.add_requirement("xxx>=1")
-        assert {"xxx"} == dist.requires.run
-        req = dist.add_requirement("xxx<=2")
-        assert req.specifier == "<=2,>=1"
-
-    def test_add_requirement_merge_markers(self):
-        dist = Distribution()
-        req = dist.add_requirement("xxx; python_version > '1'")
-        assert req.marker is not None
-        req = dist.add_requirement("xxx")
-        assert req.marker is not None
-        req = dist.add_requirement("xxx; python_version < '2'")
-        assert str(req.marker) == 'python_version > "1" and python_version < "2"'
-
-    def test_add_requirement_merge_extra_marker(self):
-        req = Requirement("xxx; python_version > '1'")
-        dist = Distribution()
-        req = dist.add_requirement(req, extra=":python_version < '2'")
-        assert str(req.marker) == 'python_version > "1" and python_version < "2"'
+        dist.add_requirement("zzz; python_version > '1'", extra="build")
+        assert {"zzz"} == dist.requires.build
 
     def test_add_requirement_invalid(self, caplog):
         dist = Distribution()
@@ -80,19 +72,12 @@ class TestDistribution(Case):
             provides_extra=["yyy"],
         )
         assert {"xxx"} == dist.requires.run
-        assert not hasattr(dist.requires, "yyy")
+        assert not dist.requires.yyy
         assert "InvalidRequirement" in caplog.text
 
-    def test_from_source_dummy_collect(self, monkeypatch, tmpdir):
+    def test_init_dummy_collect(self, monkeypatch, tmpdir):
         monkeypatch.setitem(config.cfg, "collectors", ["DummyCollector"])
         monkeypatch.setattr(importlib, "import_module", lambda _x: DummyModule())
         self._write_setup(tmpdir)
-        dist = Distribution.from_source(tmpdir)
+        dist = Distribution(tmpdir)
         assert dist.name == "xxx"
-
-    def test_from_source_no_collect(self, caplog, monkeypatch, tmpdir):
-        monkeypatch.setitem(config.cfg, "collectors", [])
-        self._write_setup(tmpdir)
-        dist = Distribution.from_source(tmpdir)
-        assert dist.name == "UNKNOWN"
-        assert "metadata unavailable" in caplog.text

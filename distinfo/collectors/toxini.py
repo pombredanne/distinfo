@@ -30,8 +30,11 @@ class ToxIni(Collector):
             return
 
         name = "py%d%d" % (sys.version_info.major, sys.version_info.minor)
-        config = toxconf.envconfigs.get(name)
-        if config is None:
+        for key in sorted(toxconf.envconfigs.keys()):
+            if key.startswith(name):
+                config = toxconf.envconfigs[key]
+                break
+        else:
             log.warning("%r has no %s environment", self, name)
             return
 

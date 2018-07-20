@@ -11,7 +11,7 @@ collectors:
   # from here are purely informational
   - FindTests
   - Git
-  - PipReqs
+  # - PipReqs
 
 # import name => package name
 package_aliases:

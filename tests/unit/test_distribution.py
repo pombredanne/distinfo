@@ -27,18 +27,6 @@ class TestDistribution(Case):
         dist = Distribution()
         assert "Distribution" in repr(dist)
 
-    def test_name(self):
-        dist = Distribution()
-        assert dist.name == "UNKNOWN"
-        dist.name = "xxx"
-        assert dist.name == "xxx"
-
-    def test_version(self):
-        dist = Distribution()
-        assert dist.version == "0.0.0"
-        dist.version = "1.0.0"
-        assert dist.version == "1.0.0"
-
     def test_add_requirement(self):
         dist = Distribution()
         dist.add_requirement("xxx")

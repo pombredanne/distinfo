@@ -25,6 +25,8 @@ class Distribution(Base):
     def __init__(self, path=None, **kwargs):
         self.path = path
         self.metadata = Munch(
+            name="UNKNOWN",
+            version="0.0.0",
             requires_dist=set(),
             provides_extra=set(),
             extensions=Munch(distinfo=Munch()),
@@ -54,24 +56,8 @@ class Distribution(Base):
         return "%s-%s%s" % (
             self.name,
             self.version,
-            self.path and " %s" % self.path or "",
+            self.path and " path=%s" % self.path or "",
         )
-
-    @property
-    def name(self):
-        return self.get("name", "UNKNOWN")
-
-    @name.setter
-    def name(self, name):
-        self.metadata.name = name
-
-    @property
-    def version(self):
-        return self.get("version", "0.0.0")
-
-    @version.setter
-    def version(self, version):
-        self.metadata.version = version
 
     @property
     def ext(self):

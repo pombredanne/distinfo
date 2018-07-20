@@ -32,8 +32,7 @@ class Distribution(Base, wrapt.ObjectProxy):
         super().__init__(metadata)
 
     def __str__(self):
-        version = getattr(self, "version", "0.0.0")
-        return "%s-%s" % (self.name, version)
+        return "%s-%s" % (self.name, self.version)
 
     @property
     def name(self):
@@ -42,6 +41,14 @@ class Distribution(Base, wrapt.ObjectProxy):
     @name.setter
     def name(self, name):
         self["name"] = name
+
+    @property
+    def version(self):
+        return self.get("version", "0.0.0")
+
+    @version.setter
+    def version(self, version):
+        self["version"] = version
 
     @classmethod
     def from_source(cls, source_dir):

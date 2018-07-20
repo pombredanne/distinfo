@@ -59,6 +59,7 @@ disable=
     inconsistent-return-statements,
     invalid-name,
     missing-docstring,
+    locally-disabled,
     no-member,
     no-self-use,
     protected-access,

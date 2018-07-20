@@ -8,7 +8,7 @@ from munch import munchify
 
 import yaml
 
-cfg = munchify(yaml.load(open(Path(__file__).parent / "config.yaml")))
+cfg = munchify(yaml.safe_load(open(Path(__file__).parent / "config.yaml")))
 
 
 def configure_logging():

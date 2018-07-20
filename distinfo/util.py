@@ -30,7 +30,7 @@ def _todict(obj):
 def dumps(obj, fmt=None, **kwargs):
     if fmt is None:
         fmt = "json"
-    return DUMPERS[fmt](_todict(obj), **kwargs)
+    return DUMPERS[fmt](_todict(obj), **kwargs).strip()
 
 
 def dump(obj, file=sys.stdout, **kwargs):

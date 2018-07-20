@@ -43,11 +43,12 @@ class Distribution(Base):
                     getattr(module, name)(self).collect()
         # XXX: a side effect of the below is that `requires` will remove
         # any invalid requirements
-        log.debug(
-            "%r requires:\n%s",
-            self,
-            util.dumps(self.requires, fmt="yamls"),
-        )
+        if self.requires:
+            log.debug(
+                "%r requires:\n%s",
+                self,
+                util.dumps(self.requires, fmt="yamls"),
+            )
 
     def __str__(self):
         return "%s-%s%s" % (

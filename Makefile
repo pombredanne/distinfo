@@ -71,8 +71,7 @@ travis-setup: $(CC_REPORTER)
 	nix-env --install --file https://github.com/cachix/cachix/tarball/v0.1.0.2
 
 .PHONY: travis-publish
-travis-publish:
-	$(MAKE) push
+travis-publish: push
 	cp result/coverage.xml .
 	cc-test-reporter after-build
 

@@ -1,10 +1,8 @@
 import logging
 
-from packaging.requirements import Requirement as _Requirement
+from packaging.requirements import InvalidRequirement, Requirement as _Requirement
 
 import pkg_resources
-
-from requirementslib.models.requirements import Requirement as XRequirement
 
 from .base import Base
 
@@ -37,10 +35,9 @@ class Requirement(Base, _Requirement):
         return str(self).split(";")[0]
 
     @classmethod
-    def parse(cls, line):
-        return cls(XRequirement.from_line(line).as_line())
-
-    @classmethod
     def parse_file(cls, path):
         for line in pkg_resources.yield_lines(open(path)):
-            yield cls.parse(line)
+            try:
+                yield cls(line)
+            except InvalidRequirement as exc:
+                log.warning("line %r of %r raised %r", line, path, exc)

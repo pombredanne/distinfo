@@ -13,7 +13,7 @@ class XCollector(PackageCollector):  # pylint: disable=abstract-method
     name = "testpkg"
 
 
-class TestPytest(Case):
+class TestCollector(Case):
 
     def test_add_requirements_file(self, tmpdir):
         requirements = "requirements.txt"

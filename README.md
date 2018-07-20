@@ -54,7 +54,9 @@ Print dependencies and metadata:
           "pytest",
         ]
       },
-      "tests": true
+      "tests": [
+        "tests",
+      ],
     }
   },
   "license": "GPL-3.0-or-later",

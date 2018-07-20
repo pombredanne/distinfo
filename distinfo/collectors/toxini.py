@@ -5,12 +5,9 @@ import sys
 
 from munch import Munch
 
-from pkg_resources import RequirementParseError
-
 from tox.config import parseconfig
 from tox.exception import ConfigError
 
-from ..requirement import Requirement
 from .collector import Collector
 
 log = logging.getLogger(__name__)
@@ -63,14 +60,8 @@ class ToxIni(Collector):
         # commands
         commands = []
         for command in config.commands:
-            if command[0:2] == ["pip", "install"]:
-                command = command[2:]
-                try:
-                    req = Requirement.parse(list2cmdline(command))
-                except RequirementParseError as exc:
-                    log.warning("%r raised %r", self, exc)
-                    continue
-                self.add_requirement(req, "test")
+            if command[0] == "pip":
+                log.warning("%r ignoring command %r", self, command)
             else:
                 cmd = []
                 for expr in command:

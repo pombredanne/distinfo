@@ -1,9 +1,6 @@
-from pkg_resources import RequirementParseError
-
 from tox.exception import ConfigError
 
 from distinfo.collectors import toxini
-from distinfo.requirement import Requirement
 
 from .cases import Case
 
@@ -41,13 +38,14 @@ class TestRequirementsFile(Case):
 
     collector = toxini.ToxIni
 
-    def test_collect(self, tmpdir):
+    def test_collect(self, caplog, tmpdir):
         tmpdir.join("tox.ini").write(TOXINI)
         tmpdir.join("requirements.txt").write(REQUIREMENTS)
         collector = self._collect(tmpdir)
-        assert {"aaa", "xxx", "zzz"} == collector.requires.test
+        assert {"aaa", "zzz"} == collector.requires.test
         assert ["python -m pytest", "false || true"] == collector.ext.tox.commands
         assert collector.ext.tox.env.ONE == "1"
+        assert "ignoring command" in caplog.text
 
     def test_collect_bad(self, tmpdir):
         tmpdir.join("tox.ini").write(TOXINI_BAD)
@@ -59,13 +57,3 @@ class TestRequirementsFile(Case):
         tmpdir.join("tox.ini").write(TOXINI)
         collector = self._collect(tmpdir)
         assert not collector.requires
-
-    def test_collect_req_error(self, monkeypatch, tmpdir):
-        monkeypatch.setattr(
-            Requirement,
-            "parse",
-            self._raiser(RequirementParseError),
-        )
-        tmpdir.join("tox.ini").write(TOXINI)
-        collector = self._collect(tmpdir)
-        assert {"zzz"} == collector.requires.test

@@ -1,8 +1,8 @@
 # Distinfo
 
 [![Build Status](https://travis-ci.org/0compute/distinfo.svg?branch=master)](https://travis-ci.org/0compute/distinfo)
-[![Quality](https://api.codacy.com/project/badge/Grade/a241056468c94640a10cceebbd86a8a5)](https://www.codacy.com/app/0arthur/distinfo)
-[![Coverage](https://api.codacy.com/project/badge/Coverage/a241056468c94640a10cceebbd86a8a5)](https://www.codacy.com/app/0arthur/distinfo)
+[![Quality](https://api.codacy.com/project/badge/Grade/a241056468c94640a10cceebbd86a8a5)](https://www.codacy.com/app/0compute/distinfo)
+[![Coverage](https://api.codacy.com/project/badge/Coverage/a241056468c94640a10cceebbd86a8a5)](https://www.codacy.com/app/0compute/distinfo)
 
 `distinfo` is a tool for extracting metadata, including full dependencies, from
 Python source distributions.

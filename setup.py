@@ -9,7 +9,7 @@ setup(
     author="Arthur Noel",
     author_email="arthur@0compute.net",
     url="https://github.com/0compute/distinfo",
-    description="Extract metadata from Python source distributions",
+    description="Extract metadata, including full dependencies, from source distributions",
     long_description=(Path(__file__).parent / "README.md").open().read(),
     long_description_content_type="text/markdown",
     keywords=("packaging", "metadata", "sdist"),

@@ -2,6 +2,8 @@ import logging
 
 from packaging.requirements import Requirement as _Requirement
 
+import pkg_resources
+
 from requirementslib.models.requirements import Requirement as XRequirement
 
 from .base import Base
@@ -37,8 +39,5 @@ class Requirement(Base, _Requirement):
 
     @classmethod
     def parse_file(cls, path):
-        for line in open(path):
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
+        for line in pkg_resources.yield_lines(open(path)):
             yield cls.parse(line)

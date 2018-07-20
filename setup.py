@@ -49,7 +49,6 @@ setup(
         "requirementslib",
         "setuptools",
         "tox",
-        "wrapt",
         "pyyaml",
     ),
     # FIXME: nixipy misses this

@@ -12,8 +12,6 @@ from property_manager import cached_property
 
 from setuptools import sandbox
 
-import wrapt
-
 from . import util
 from .base import Base
 from .config import cfg
@@ -22,19 +20,16 @@ from .requirement import Requirement
 log = logging.getLogger(__name__)
 
 
-class Distribution(Base, wrapt.ObjectProxy):
-
-    path = None
+class Distribution(Base):
 
     def __init__(self, path=None, **kwargs):
-        metadata = Munch(
+        self.path = path
+        self.metadata = Munch(
             requires_dist=set(),
             provides_extra=set(),
             extensions=Munch(distinfo=Munch()),
         )
-        metadata.update(kwargs)
-        super().__init__(metadata)
-        self.path = path
+        self.metadata.update(kwargs)
         if self.path is not None:
             self.path = os.path.relpath(self.path)
             with sandbox.pushd(self.path), sandbox.save_path():
@@ -52,6 +47,9 @@ class Distribution(Base, wrapt.ObjectProxy):
             util.dumps(self.requires, fmt="yamls"),
         )
 
+    def __getattr__(self, key):
+        return getattr(self.metadata, key)
+
     def __str__(self):
         return "%s-%s%s" % (
             self.name,
@@ -65,7 +63,7 @@ class Distribution(Base, wrapt.ObjectProxy):
 
     @name.setter
     def name(self, name):
-        self["name"] = name
+        self.metadata.name = name
 
     @property
     def version(self):
@@ -73,7 +71,7 @@ class Distribution(Base, wrapt.ObjectProxy):
 
     @version.setter
     def version(self, version):
-        self["version"] = version
+        self.metadata.version = version
 
     @property
     def ext(self):

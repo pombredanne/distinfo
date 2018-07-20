@@ -96,9 +96,9 @@ class DistInfo(Collector):
             key = key.lower().replace("-", "_")
             key = self.KEY_ALIASES.get(key, key)
             if key in self.MULTI_KEYS:
-                self.dist.setdefault(key, set()).add(value)
+                self.metadata.setdefault(key, set()).add(value)
             else:
-                self.dist[key] = value
+                self.metadata[key] = value
 
         # get requirements from distutils dist
         extras = Munch(setup_requires="build", tests_require="test")

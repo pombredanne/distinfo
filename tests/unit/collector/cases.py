@@ -12,7 +12,7 @@ class Case(_Case):
     def _collect(self, path, name=None, **kwargs):
         dist = Distribution()
         if name is not None:
-            dist["name"] = name
+            dist.name = name
         for req in kwargs.pop("reqs", []):
             dist.add_requirement(req)
         dist.ext.update(kwargs)

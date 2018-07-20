@@ -955,21 +955,6 @@ with rec {
     };
   };
 
-  wrapt = python.pkgs.buildPythonPackage rec {
-    pname = "wrapt";
-    version = "1.10.11";
-    src = python.pkgs.fetchPypi {
-      inherit pname version;
-      sha256 = "d4d560d479f2c21e1b5443bbd15fe7ec4b37fe7e53d335d3b9b0a7b1226fe3c6";
-    };
-    doCheck = false;
-    meta = {
-      description = "Module for decorators, wrappers and monkey patching.";
-      homepage = https://github.com/GrahamDumpleton/wrapt;
-      license = lib.licenses.bsdOriginal;
-    };
-  };
-
   yarg = python.pkgs.buildPythonPackage rec {
     pname = "yarg";
     version = "0.1.9";
@@ -1011,7 +996,6 @@ python.pkgs.buildPythonPackage rec {
     requirementslib
     tox
     twine
-    wrapt
   ];
   LANG = "en_US.UTF-8";
   checkPhase = "HOME=$NIX_BUILD_TOP pytest && cp coverage.xml $out";

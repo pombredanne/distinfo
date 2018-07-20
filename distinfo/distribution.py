@@ -22,6 +22,8 @@ log = logging.getLogger(__name__)
 
 class Distribution(Base):
 
+    BUILD_IMPLICIT = ("setuptools", "wheel")
+
     def __init__(self, path=None, **kwargs):
         self.path = path
         self.metadata = Munch(
@@ -127,6 +129,10 @@ class Distribution(Base):
         else:
             # belt and braces
             assert isinstance(req, Requirement)
+
+        # skip out for implicit build requirements
+        if extra == "build" and req in self.BUILD_IMPLICIT:
+            return
 
         # skip out if requirement is already present
         if req in self.requires[extra] \

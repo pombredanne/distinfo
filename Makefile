@@ -34,10 +34,6 @@ ftest: test
 lint:
 	prospector --with-tool=mccabe --with-tool=pyroma --with-tool=vulture $(ARGS)
 
-.PHONY: todo
-todo:
-	git grep --line-number "FIXME|HACK|TODO|TOGO"
-
 .PHONY: clean
 clean:
 	git clean -fdX

@@ -16,7 +16,7 @@ class Requirement(Base, _Requirement):
         self.requirement_string = requirement_string
 
     def __hash__(self):
-        # HACK: used by set __contains__
+        # hack: makes it easy to check if a set contains the requirement
         return hash(self.name.lower())
 
     def __eq__(self, other):

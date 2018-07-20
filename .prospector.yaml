@@ -5,9 +5,6 @@ ignore-paths:
   # vendored
   - nixipy/nix.py
 
-mccabe:
-  run: false
-
 pep8:
   disable:
     - N806  # variable in function should be lowercase
@@ -36,3 +33,9 @@ pylint:
     - too-many-locals
     - unsubscriptable-object
   load-plugins: verboselogs.pylint
+
+pyroma:
+  run: true
+
+vulture:
+  run: true

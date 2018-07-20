@@ -24,7 +24,7 @@ class TestDistInfo(Case):
         self._write_setup(tmpdir, SETUP)
         tmpdir.join("xxx").mkdir().join("__init__.py").write("")
         collector = self._collect(tmpdir)
-        assert {"setuptools"} == collector.requires.build
+        assert not collector.requires.build
         assert {"bbb"} == collector.requires.run
         assert {"ccc", "ddd"} == collector.requires.test
         assert ["xxx"] == collector.ext.packages

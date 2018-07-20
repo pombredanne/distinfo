@@ -64,15 +64,17 @@ $(CC_REPORTER):
 	chmod +x $@
 	$(notdir $@) before-build
 
-.PHONY: travis-setup
-travis-setup: $(CC_REPORTER)
+.PHONY: travis-install
+travis-install: $(CC_REPORTER)
 	sudo mkdir -p /etc/nix
 	echo "$$NIX_CONF" | sudo tee /etc/nix/nix.conf
 	nix-env --install --file https://github.com/cachix/cachix/tarball/v0.1.0.2
 
-.PHONY: travis-publish
-travis-publish: push
+.PHONY: travis-success
+travis-success: push
 	cp result/coverage.xml .
 	cc-test-reporter after-build
+	pip install codacy-coverage
+	python-codacy-coverage -r coverage.xml
 
 endif

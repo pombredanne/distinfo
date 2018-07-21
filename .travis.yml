@@ -10,3 +10,12 @@ env:
 install: make travis-install
 
 after_success: make travis-success
+
+deploy:
+  provider: pypi
+  user: noela
+  password:
+    secure: j4u59Td0q1Fj/+QrTtmGDKaKIrmWhODQ4t8Oq1rJR9vsNuyntZX81B9KIDASysAV8QiNghcmFI9X28wu0uEznt6ACC1j3IK6bu1pCxTLt9IiaC9rxaXIEWhGRt6sWggcMnMxUlk3IRjQYd6EalQHC+jwQIoknLhgidrPcT8AWEp+dxu7wAptdpynsZNFcv4C0fgt1VhP5OahvYACuDu/Xr/dkKpcy3A/kfG/jN0YWLr+bmy58YFpcn87KyE48B9zFMFVlyqZkvy4oQ2k3uJJghdaDdf5Th47Bc3l0WbIN8QGJCtwE15buOyJurLYO/rnJuQueaV0ORU4v1Iz10iwVMu+uuJNjIr/C61uTjonOPlCqWs1JB9vtuEIb9iGq1G5rwdu5pcc4Kkl99GwGp9czqelMNaYDsYRXiVibhb+OSQcAP0BxDHMERznOSpGwa/YiXlIM3nf7LNAD/BLBkBnI+CNtZbZgPrJ6bLry68NhxkyJ/nXKWz1D5Exphr7sBq3J5kW0NRn4oMRcD5sjwQW3lBHKsNJeDbqqwcDLO/BqumgBYAA4g0ZXtXLSkRKR1lmc63jj3GggF5VIzii5gfrCykR1CPX0v2TEuhsjTWxx6VN7VgIf5b1JXYOnbdPL9wVRGx+WLvMZgRUW0dMwPuxH0d1fHgk5dQGvXDAHLTLAaE=
+  on:
+    tags: true
+  distributions: sdist bdist_wheel

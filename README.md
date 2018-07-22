@@ -17,7 +17,7 @@ Dump json metadata to stdout:
 
 ### Library
 
-Print dependencies and metadata:
+Print requirements and metadata:
 
 ``` python
 >>> from distinfo import Distribution, dump

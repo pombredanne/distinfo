@@ -120,15 +120,12 @@ class Distribution(Base):
     def add_requirement(self, req, extra="run"):
 
         # cast to Requirement
-        if isinstance(req, str):
+        if not isinstance(req, Requirement):
             try:
                 req = Requirement(req)
             except InvalidRequirement as exc:
                 log.warning("%r %r add %r raised %r", self, extra, req, exc)
                 return
-        else:
-            # belt and braces
-            assert isinstance(req, Requirement)
 
         # skip out for implicit build requirements
         if extra == "build" and req in self.BUILD_IMPLICIT:

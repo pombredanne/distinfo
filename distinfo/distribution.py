@@ -31,7 +31,7 @@ class Distribution(Base):
             version="0.0.0",
             provides_extra=set(),
             requires_dist=set(),
-            extensions=Munch(distinfo=Munch()),
+            extensions=Munch(distinfo=DefaultMunch(None)),
         )
         self.metadata.update(kwargs)
         if self.path is not None:

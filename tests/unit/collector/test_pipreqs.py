@@ -34,7 +34,7 @@ class TestPipReqs(Case):
 
     def test_collect_empty(self, tmpdir):
         collector = super().test_collect_empty(tmpdir)
-        assert not hasattr(collector.ext, "imports")
+        assert not collector.ext.imports
 
     def test_collect_fail(self, monkeypatch, tmpdir):
         tmpdir.join("xxx").mkdir().join("__init__.py") .write("import aaa")

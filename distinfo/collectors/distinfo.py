@@ -115,7 +115,4 @@ class DistInfo(Collector):
                 self.add_requirement(req, extra)
 
         # get packages
-        self.ext.packages = list(map(
-            lambda p: str(p.parent.relative_to(".")),
-            sorted(self.path.glob("*/__init__.py")),
-        ))
+        self.ext.packages = getattr(dist, "packages", [])

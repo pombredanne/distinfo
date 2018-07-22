@@ -76,8 +76,8 @@ class PackageCollector(Collector):
         # check imports for the package name
         req = False
         extra = "test"
-        imports = getattr(self.ext, "imports", {})
-        for package in getattr(self.ext, "packages", []):
+        imports = self.ext.get("imports", {})
+        for package in self.ext.get("packages", []):
             if self.name in imports.get(package, []):
                 req = self.name
                 if package == self.dist.name:

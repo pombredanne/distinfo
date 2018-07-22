@@ -17,6 +17,7 @@ class PipReqs(Collector):
     )
 
     def _get_packages(self, path):
+        path = path.replace(".", "/")
         try:
             return set(
                 filter(
@@ -36,6 +37,5 @@ class PipReqs(Collector):
 
     def _collect(self):
         self.ext.imports = Munch()
-        packages = getattr(self.ext, "packages", [])
-        for package in packages:
+        for package in self.ext.get("packages", []):
             self.ext.imports[package] = self._get_packages(package) - {self.dist.name}

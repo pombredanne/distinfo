@@ -34,10 +34,6 @@ ftest: test
 lint:
 	prospector --with-tool=mccabe --with-tool=pyroma --with-tool=vulture $(ARGS)
 
-.PHONY: clean
-clean:
-	git clean -fdX
-
 ifdef TRAVIS
 
 define NIX_CONF

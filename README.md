@@ -1,5 +1,6 @@
 # Distinfo
 
+[![Built with Nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 [![Build Status](https://travis-ci.org/0compute/distinfo.svg?branch=master)](https://travis-ci.org/0compute/distinfo)
 [![Quality](https://api.codacy.com/project/badge/Grade/a241056468c94640a10cceebbd86a8a5)](https://www.codacy.com/app/0compute/distinfo)
 [![Coverage](https://api.codacy.com/project/badge/Coverage/a241056468c94640a10cceebbd86a8a5)](https://www.codacy.com/app/0compute/distinfo)

@@ -116,3 +116,4 @@ class DistInfo(Collector):
 
         # get packages
         self.ext.packages = getattr(dist, "packages", [])
+        self.ext.modules = getattr(dist, "py_modules", [])

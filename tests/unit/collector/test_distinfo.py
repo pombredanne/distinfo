@@ -4,9 +4,12 @@ from distinfo.collectors import distinfo
 from .cases import Case
 
 SETUP = """
-from setuptools import setup
+from setuptools import setup, find_packages
 setup(
-    # this needs to be present or distutils barfs
+    packages=find_packages(),
+    py_modules=["yyy"],
+    # setup_requires packages must be present or distutils will barf, so we
+    # use one that definitely is here
     setup_requires=["setuptools"],
     install_requires=["bbb"],
     # badly specified requirements, seen in unittest2
@@ -28,6 +31,7 @@ class TestDistInfo(Case):
         assert {"bbb"} == collector.requires.run
         assert {"ccc", "ddd"} == collector.requires.test
         assert ["xxx"] == collector.ext.packages
+        assert ["yyy"] == collector.ext.modules
 
     def test_process_output(self, tmpdir):
         collector = self._collect(tmpdir)

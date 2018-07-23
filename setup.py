@@ -64,4 +64,5 @@ setup(
             "pytest-sugar",
         ),
     ),
+    python_requires=">=3.6",
 )

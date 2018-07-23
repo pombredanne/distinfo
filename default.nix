@@ -935,7 +935,7 @@ python.pkgs.buildPythonPackage rec {
     tox
   ];
   LANG = "en_US.UTF-8";
-  checkPhase = "HOME=$NIX_BUILD_TOP pytest && cp coverage.xml $out";
+  checkPhase = "pytest && cp coverage.xml $out";
   postInstall = "wrapProgram $out/bin/distinfo --set LANG ${LANG}";
   meta = {
     description = "Extract metadata, including full dependencies, from source distributions";

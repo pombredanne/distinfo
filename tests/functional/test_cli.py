@@ -1,5 +1,7 @@
 import json
 
+import appdirs
+
 from click.testing import CliRunner
 
 from distinfo import cli
@@ -55,4 +57,5 @@ class TestCli(Case):
 
     def test_main_interactive(self, monkeypatch, tmpdir):
         monkeypatch.setattr(cli.repl, "embed", lambda *a, **k: True)
-        self._invoke(tmpdir, "-i")
+        monkeypatch.setattr(appdirs, "user_cache_dir", lambda *a: tmpdir.mkdir("cache"))
+        self._invoke(tmpdir.mkdir("src"), "-i")

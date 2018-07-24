@@ -11,6 +11,8 @@ log = logging.getLogger(__name__)
 
 class Requirement(Base, _Requirement):
 
+    _short_name = "Req"
+
     def __init__(self, requirement_string):
         super().__init__(requirement_string)
         self.requirement_string = requirement_string

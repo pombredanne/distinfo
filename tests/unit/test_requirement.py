@@ -12,7 +12,7 @@ class TestRequirement(Case):
 
     def test_repr(self):
         req = Requirement("xxx")
-        assert "Requirement xxx" in repr(req)
+        assert repr(req) == "<Req xxx>"
 
     def test_eq(self):
         assert Requirement("xxx") == Requirement("xxx")

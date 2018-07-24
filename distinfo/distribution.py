@@ -22,6 +22,8 @@ log = logging.getLogger(__name__)
 
 class Distribution(Base):
 
+    _short_name = "Dist"
+
     BUILD_IMPLICIT = ("setuptools", "wheel")
 
     def __init__(self, path=None, **kwargs):

@@ -58,6 +58,7 @@ class ToxIni(Collector):
             env[key] = config.setenv[key].replace(os.getcwd(), ".")
 
         # commands
+        cwd = os.getcwd()
         commands = []
         for command in config.commands:
             if command[0] == "pip":
@@ -65,7 +66,10 @@ class ToxIni(Collector):
             else:
                 cmd = []
                 for expr in command:
-                    cmd.append(expr.replace(os.getcwd(), "."))
+                    expr = expr.replace(str(config.envpython), "python")
+                    expr = expr.replace(cwd + "/", "")
+                    expr = expr.replace(cwd, ".")
+                    cmd.append(expr)
                 cmd = list2cmdline(cmd).strip()
                 if cmd.startswith("-"):
                     cmd = "%s || true" % cmd[1:].strip()

@@ -1,7 +1,6 @@
 import distutils.core
 from email.parser import FeedParser
 import logging
-import re
 
 import capturer
 
@@ -13,8 +12,6 @@ from .. import const
 from .collector import Collector
 
 log = logging.getLogger(__name__)
-
-SEARCH_PATTERN = re.compile("Searching for (.*)")
 
 
 # run_setup from distutils.core doesn't work in every case - this does
@@ -51,9 +48,14 @@ class DistInfo(Collector):
         requires="requires_dist",
     )
 
-    def _process_output(self, output):
-        for req in SEARCH_PATTERN.findall(output):
-            self.add_requirement(req, "build")
+    EXTRAS = Munch(
+        setup_requires="build",
+        install_requires="run",
+        tests_require="test",
+    )
+
+    def _get_pkginfo(self):
+        return list(self.path.glob("**/*.egg-info/PKG-INFO"))
 
     def _collect(self):
 
@@ -61,29 +63,22 @@ class DistInfo(Collector):
             log.warning("%r has no %s", self, const.SETUP_PY)
             return
 
-        warnings = []
         try:
             with capturer.CaptureOutput(relay=False) as capture:
-                try:
-                    dist = run_setup("dist_info")
-                except BaseException as exc:
-                    warnings.append("%r dist_info raised %r" % (self, exc))
-                    try:
-                        dist = run_setup("egg_info")
-                    except BaseException as exc:
-                        warnings.append("%r egg_info raised %r" % (self, exc))
-                        return
-        finally:
-            for warning in warnings:
-                log.warning(warning)
-            self._process_output(capture.get_text())
+                if self._get_pkginfo():
+                    # run anything to get the dist object
+                    dist = run_setup("-h")
+                else:
+                    # not using wheel's dist_info as it fails for some packages
+                    # (cryptography), and it adds nothing since it does not
+                    # deal with build and test requirements
+                    dist = run_setup("egg_info")
+        except BaseException:
+            log.warning("setup failure:\n%s", capture.get_text())
+            raise
 
         # get metadata
-        provides_dist = True
-        infos = list(self.path.glob("**/*.dist-info/METADATA"))
-        if not infos:
-            provides_dist = False
-            infos = list(self.path.glob("**/*.egg-info/PKG-INFO"))
+        infos = self._get_pkginfo()
         assert infos
         parser = FeedParser()
         parser.feed(open(infos[0]).read())
@@ -100,17 +95,14 @@ class DistInfo(Collector):
                 self.metadata[key] = value
 
         # get requirements from distutils dist
-        extras = Munch(setup_requires="build", tests_require="test")
-        if not provides_dist:
-            extras.install_requires = "run"
-            for extra, reqs in getattr(dist, "extras_require", {}).items():
-                for req in reqs:
-                    self.add_requirement(req, extra)
-        for attr, extra in extras.items():
+        for attr, extra in self.EXTRAS.items():
             reqs = getattr(dist, attr, None) or []
             # fix incorrectly specified requirements (unittest2 does this)
             if isinstance(reqs, tuple) and isinstance(reqs[0], list):
                 reqs = reqs[0]
+            for req in reqs:
+                self.add_requirement(req, extra)
+        for extra, reqs in getattr(dist, "extras_require", {}).items():
             for req in reqs:
                 self.add_requirement(req, extra)
 

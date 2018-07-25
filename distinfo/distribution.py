@@ -137,19 +137,14 @@ class Distribution(Base):
             return
 
         if extra != "run":
-            condition = ""
             if ":" in extra:  # setuptools extra:condition syntax
                 extra, condition = extra.split(":", 1)
+                if not Marker(condition).evaluate():
+                    return
             if extra:
                 extra = pkg_resources.safe_extra(extra)
                 self.provides_extra.add(extra)
-                marker = "extra == '%s'" % extra
-                if condition:
-                    marker = "%s and (%s)" % (marker, condition)
-            else:
-                assert condition
-                marker = condition
-            req.marker = Marker(marker)
+                req.marker = Marker("extra == '%s'" % extra)
 
         self.requires_dist.add(str(req))
         del self.requires

@@ -2,6 +2,7 @@ import configparser
 import logging
 from pathlib import Path
 
+from .. import util
 from ..base import Base
 from ..requirement import Requirement
 
@@ -27,25 +28,15 @@ class Collector(Base):
     def _collect(self):
         raise NotImplementedError()
 
-    def _clean_dict(self, obj):
-        drop = []
-        for key, value in obj.items():
-            if not isinstance(value, bool) and not value:
-                drop.append(key)
-            elif isinstance(value, dict):
-                self._clean_dict(value)
-        for key in drop:
-            del obj[key]
-
     def collect(self):
         assert self.path is not None
         self._collect()
-        self._clean_dict(self.ext)
+        util.clean_dict(self.ext)
 
     def add_requirement(self, req, extra):
         req = self.dist.add_requirement(req, extra=extra)
         if req is not None:
-            log.debug("%r %r add %r", self, extra, req)
+            log.debug("%r add %r", self, req)
 
     def add_requirements_file(self, path, extra):
         if path in self._seen_files:

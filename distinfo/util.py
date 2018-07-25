@@ -15,6 +15,17 @@ DUMPERS = dict(
 DEFAULT_DUMPER = "json"
 
 
+def clean_dict(obj):
+    drop = []
+    for key, value in obj.items():
+        if not isinstance(value, bool) and not value:
+            drop.append(key)
+        elif isinstance(value, dict):
+            clean_dict(value)
+    for key in drop:
+        del obj[key]
+
+
 def _todict(obj):
     result = dict()
     for key, value in obj.items():

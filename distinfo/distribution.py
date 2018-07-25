@@ -8,6 +8,8 @@ from munch import DefaultMunch, Munch
 from packaging.markers import InvalidMarker, Marker
 from packaging.requirements import InvalidRequirement
 
+import pkg_resources
+
 from property_manager import cached_property
 
 from setuptools import sandbox
@@ -135,17 +137,19 @@ class Distribution(Base):
             return
 
         if extra != "run":
-            self.provides_extra.add(extra)
-            # set marker
-            try:
-                marker = Marker(extra[1:] if extra.startswith(":")
-                                else "extra == '%s'" % extra)
-            except InvalidMarker as exc:
-                log.warning("%r %r add %r raised %r", self, extra, req, exc)
-                return
-            if req.marker is not None:
-                marker = Marker("(%s) and %s" % (req.marker, marker))
-            req.marker = marker
+            condition = ""
+            if ":" in extra:  # setuptools extra:condition syntax
+                extra, condition = extra.split(":", 1)
+            if extra:
+                extra = pkg_resources.safe_extra(extra)
+                self.provides_extra.add(extra)
+                marker = "extra == '%s'" % extra
+                if condition:
+                    marker = "%s and (%s)" % (marker, condition)
+            else:
+                assert condition
+                marker = condition
+            req.marker = Marker(marker)
 
         self.requires_dist.add(str(req))
         del self.requires

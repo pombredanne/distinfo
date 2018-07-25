@@ -39,16 +39,14 @@ class TestDistribution(Case):
         assert {"yyy"} == dist.requires.test
         dist.add_requirement("zzz; python_version > '1'", extra="build")
         assert {"zzz"} == dist.requires.build
+        dist.add_requirement("zzz", extra="build:python_version > '1'")
+        dist.add_requirement("aaa", extra=":python_version > '1'")
+        assert {"aaa", "xxx"} == dist.requires.run
 
     def test_add_requirement_invalid(self, caplog):
         dist = Distribution()
         dist.add_requirement("-cxxx")
         assert "InvalidRequirement" in caplog.text
-
-    def test_add_requirement_invalid_marker(self, caplog):
-        dist = Distribution()
-        dist.add_requirement("xxx", extra=":xxx == '1'")
-        assert "InvalidMarker" in caplog.text
 
     def test_requires(self, caplog):
         dist = Distribution(

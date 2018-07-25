@@ -55,11 +55,7 @@ class Distribution(Base):
             )
 
     def __str__(self):
-        return "%s-%s%s" % (
-            self.name,
-            self.version,
-            self.path and " path=%s" % self.path or "",
-        )
+        return "%s-%s" % (self.name, self.version)
 
     @property
     def name(self):

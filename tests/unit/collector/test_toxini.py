@@ -43,7 +43,7 @@ class TestRequirementsFile(Case):
         tmpdir.join("requirements.txt").write(REQUIREMENTS)
         collector = self._collect(tmpdir)
         assert {"aaa", "zzz"} == collector.requires.test
-        assert ["python -m pytest", "false || true"] == collector.ext.tox.commands
+        assert [["python", "-m", "pytest"], ["-", "false"]] == collector.ext.tox.commands
         assert collector.ext.tox.env.ONE == "1"
         assert "ignoring command" in caplog.text
 

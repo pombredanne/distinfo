@@ -1,6 +1,5 @@
 import logging
 import os
-from subprocess import list2cmdline
 import sys
 
 from munch import Munch
@@ -67,12 +66,11 @@ class ToxIni(Collector):
                 cmd = []
                 for expr in command:
                     expr = expr.replace(str(config.envpython), "python")
+                    expr = expr.replace(str(config.envdir) + "/", "")
+                    expr = expr.replace(str(config.envname), "result")
                     expr = expr.replace(cwd + "/", "")
                     expr = expr.replace(cwd, ".")
                     cmd.append(expr)
-                cmd = list2cmdline(cmd).strip()
-                if cmd.startswith("-"):
-                    cmd = "%s || true" % cmd[1:].strip()
                 commands.append(cmd)
 
         self.ext.tox = Munch(commands=commands, env=env)

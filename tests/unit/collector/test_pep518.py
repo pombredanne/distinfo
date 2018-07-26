@@ -4,7 +4,7 @@ from .cases import Case
 
 PYPROJECT = """
 [build-system]
-requires = ["zzz"]
+requires = ["zzz", "flit"]
 
 [tool.flit.metadata]
 requires=["yyy"]

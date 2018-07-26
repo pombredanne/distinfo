@@ -12,13 +12,16 @@ class Pep518(Collector):
 
     PYPROJECT = "pyproject.toml"
 
+    BUILD_IGNORE = ("flit",)
+
     def _collect(self):
         pyproject = self.path / self.PYPROJECT
         if pyproject.exists():
             toml = pytoml.load(pyproject.open())
             # pep 518
             for req in util.dotget(toml, "build-system.requires", []):
-                self.add_requirement(req, "build")
+                if req not in self.BUILD_IGNORE:
+                    self.add_requirement(req, "build")
             # flit: http://flit.readthedocs.io/en/latest/pyproject_toml.html
             # FIXME: incomplete
             for req in util.dotget(toml, "tool.flit.metadata.requires", []):

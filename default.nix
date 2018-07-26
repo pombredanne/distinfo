@@ -68,21 +68,6 @@ with rec {
     };
   };
 
-  capturer = python.pkgs.buildPythonPackage rec {
-    pname = "capturer";
-    version = "2.4";
-    src = python.pkgs.fetchPypi {
-      inherit pname version;
-      sha256 = "090142a58f3f85def3a7dd55d9024d0d1a86d1a88aaf9317c0f146244994a615";
-    };
-    propagatedBuildInputs = [ humanfriendly ];
-    doCheck = false;
-    meta = {
-      description = "Easily capture stdout/stderr of the current process and subprocesses";
-      homepage = https://capturer.readthedocs.io;
-    };
-  };
-
   certifi = python.pkgs.buildPythonPackage rec {
     pname = "certifi";
     version = "2018.4.16";
@@ -239,10 +224,10 @@ with rec {
 
   humanfriendly = python.pkgs.buildPythonPackage rec {
     pname = "humanfriendly";
-    version = "4.15.1";
+    version = "4.16.1";
     src = python.pkgs.fetchPypi {
       inherit pname version;
-      sha256 = "f772c455f8de6af1185c8fea7d2920ba469ea9f7ccfc42635bbdd7f115cdd575";
+      sha256 = "ed1e98ae056b597f15b41bddcc32b9f21e6ab4f3445f9faad1668675de759f7b";
     };
     doCheck = false;
     meta = {
@@ -559,22 +544,6 @@ with rec {
     };
   };
 
-  pytest-runner = python.pkgs.buildPythonPackage rec {
-    pname = "pytest-runner";
-    version = "4.2";
-    src = python.pkgs.fetchPypi {
-      inherit pname version;
-      sha256 = "d23f117be39919f00dd91bffeb4f15e031ec797501b717a245e377aee0f577be";
-    };
-    buildInputs = [ setuptools_scm ];
-    propagatedBuildInputs = [ pytest ];
-    doCheck = false;
-    meta = {
-      description = "Invoke py.test as distutils command with dependency resolution";
-      homepage = https://github.com/pytest-dev/pytest-runner;
-    };
-  };
-
   pytest-sugar = python.pkgs.buildPythonPackage rec {
     pname = "pytest-sugar";
     version = "0.9.1";
@@ -714,10 +683,10 @@ with rec {
 
   setuptools_scm = python.pkgs.buildPythonPackage rec {
     pname = "setuptools_scm";
-    version = "2.1.0";
+    version = "3.0.2";
     src = python.pkgs.fetchPypi {
       inherit pname version;
-      sha256 = "a767141fecdab1c0b3c8e4c788ac912d7c94a0d6c452d40777ba84f918316379";
+      sha256 = "113cea38b2edba8538b7e608b58cbd7e09bb71b16d968a9b97e36b4805e06d59";
     };
     doCheck = false;
     meta = {
@@ -914,15 +883,13 @@ python.pkgs.buildPythonPackage rec {
   pname = "distinfo";
   version = "0.3.0.dev0";
   src = nix-gitignore.gitignoreSource ./.;
-  buildInputs = [ pytest-runner ];
+  buildInputs = [ pkgs.glibcLocales ];
   propagatedBuildInputs = [
     appdirs
-    capturer
     click
     coloredlogs
     munch
     pdbpp
-    pkgs.glibcLocales
     pipreqs
     property-manager
     ptpython
@@ -936,7 +903,6 @@ python.pkgs.buildPythonPackage rec {
   ];
   LANG = "en_US.UTF-8";
   checkPhase = "pytest && cp coverage.xml $out";
-  postInstall = "wrapProgram $out/bin/distinfo --set LANG ${LANG}";
   meta = {
     description = "Extract metadata, including full dependencies, from source distributions";
     homepage = https://github.com/0compute/distinfo;

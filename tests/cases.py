@@ -1,3 +1,5 @@
+from setuptools import sandbox
+
 from distinfo import const
 
 SETUP = """
@@ -8,12 +10,16 @@ setup()
 
 class Case:
 
-    DIST = "test.dist"
-
     def _raiser(self, exc=Exception):
         def _raiser(*_args, **_kwargs):
             raise exc()
         return _raiser
 
     def _write_setup(self, tmpdir, setup=SETUP):
-        tmpdir.join(const.SETUP_PY).write(setup)
+        setup_py = tmpdir.join(const.SETUP_PY)
+        setup_py.write(setup)
+        return setup_py
+
+    def _run_egg_info(self, *args, **kwargs):
+        setup = self._write_setup(*args, **kwargs)
+        sandbox.run_setup(str(setup), ["egg_info"])

@@ -1,6 +1,6 @@
-# metadata collectors, executed in order
+# metadata collectors, executed in order, latter depends on former
 collectors:
-  # DistInfo must be first as the rest depend on it
+  - EggInfo
   - DistInfo
   - Pep518
   - Pipfile

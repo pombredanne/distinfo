@@ -20,9 +20,9 @@ setup(
 class TestCli(Case):
 
     def _invoke(self, tmpdir, *args, **kwargs):
+        self._run_egg_info(tmpdir, SETUP)
         exit_code = kwargs.pop("exit_code", 0)
         kwargs.setdefault("catch_exceptions", False)
-        self._write_setup(tmpdir, SETUP)
         runner = CliRunner()
         result = runner.invoke(cli.main, map(str, args + (tmpdir,)), **kwargs)
         assert result.exit_code == exit_code

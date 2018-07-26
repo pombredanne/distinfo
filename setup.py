@@ -33,11 +33,10 @@ setup(
         ),
     ),
     setup_requires=(
-        "pytest-runner",
+        # "pytest-runner",
     ),
     install_requires=(
         "appdirs",
-        "capturer",
         "click",
         "coloredlogs",
         "munch",

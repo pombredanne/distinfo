@@ -26,11 +26,15 @@ class ToxIni(Collector):
             return
 
         name = "py%d%d" % (sys.version_info.major, sys.version_info.minor)
-        configs = sorted(toxconf.envconfigs.values(), key=lambda c: c.envname)
+        configs = sorted([c for c in toxconf.envconfigs.values()
+                          if c.envname.startswith("py")],
+                         key=lambda c: c.envname)
         for config in configs:
             if config.envname.startswith(name):
                 break
         else:
+            if not configs:
+                return
             config = configs[0]
             log.warning(
                 "%r has no standard environment, taking %r",
@@ -51,7 +55,9 @@ class ToxIni(Collector):
                     continue
                 self.add_requirements_file(reqs_file, "test")
             else:
-                self.add_requirement(str(dep), "test")
+                # don't allow pinned dependencies
+                dep = dep.name.split("==")[0].strip()
+                self.add_requirement(dep, "test")
 
         # environment
         env = Munch()

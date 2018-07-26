@@ -50,6 +50,7 @@ class TestRequirementsFile(Case):
     def test_collect_bad(self, tmpdir):
         tmpdir.join("tox.ini").write(TOXINI_BAD)
         collector = self._collect(tmpdir)
+        assert not collector.ext.tox
         assert not collector.requires
 
     def test_collect_conf_error(self, monkeypatch, tmpdir):

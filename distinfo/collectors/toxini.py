@@ -26,13 +26,17 @@ class ToxIni(Collector):
             return
 
         name = "py%d%d" % (sys.version_info.major, sys.version_info.minor)
-        for key in sorted(toxconf.envconfigs.keys()):
-            if key.startswith(name):
-                config = toxconf.envconfigs[key]
+        configs = sorted(toxconf.envconfigs.values(), key=lambda c: c.envname)
+        for config in configs:
+            if config.envname.startswith(name):
                 break
         else:
-            log.warning("%r has no %s environment", self, name)
-            return
+            config = configs[0]
+            log.warning(
+                "%r has no standard environment, taking %r",
+                self,
+                config.envname,
+            )
 
         # dependencies
         for dep in config.deps:
@@ -65,7 +69,7 @@ class ToxIni(Collector):
             else:
                 cmd = []
                 for expr in command:
-                    expr = expr.replace(str(config.envpython), "python")
+                    expr = expr.replace(str(config.envbindir) + "/", "")
                     expr = expr.replace(str(config.envdir) + "/", "")
                     expr = expr.replace(str(config.envname), "result")
                     expr = expr.replace(cwd + "/", "")

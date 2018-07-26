@@ -36,3 +36,8 @@ class TestPytest(Case):
         tmpdir.join("setup.cfg").write("")
         collector = self._collect(tmpdir)
         assert not collector.requires
+
+    def test_ini(self, tmpdir):
+        tmpdir.join("pytest.ini").write("")
+        collector = self._collect(tmpdir)
+        assert {"pytest"} == collector.requires.test

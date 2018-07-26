@@ -21,3 +21,7 @@ class Pytest(PackageCollector):
         conftest = list(self.path.glob("**/conftest.py"))
         if conftest:
             return self.name
+
+        # look for ini
+        if (self.path / "pytest.ini").exists():
+            return self.name

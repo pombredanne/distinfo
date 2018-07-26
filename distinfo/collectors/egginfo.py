@@ -1,4 +1,3 @@
-import distutils
 from email.parser import FeedParser
 import logging
 

@@ -5,7 +5,7 @@ import sys
 
 from munch import DefaultMunch, Munch
 
-from packaging.markers import InvalidMarker, Marker
+from packaging.markers import Marker
 from packaging.requirements import InvalidRequirement
 
 import pkg_resources

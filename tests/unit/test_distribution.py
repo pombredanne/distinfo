@@ -45,6 +45,11 @@ class TestDistribution(Case):
         dist.add_requirement("ccc", extra=":python_version < '1'")
         assert {"aaa", "xxx"} == dist.requires.run
 
+    def test_add_requirement_implicit(self):
+        dist = Distribution()
+        dist.add_requirement("setuptools")
+        assert not dist.requires
+
     def test_add_requirement_invalid(self, caplog):
         dist = Distribution()
         dist.add_requirement("-cxxx")

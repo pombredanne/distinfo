@@ -26,7 +26,7 @@ class Distribution(Base):
 
     _short_name = "Dist"
 
-    BUILD_IMPLICIT = ("setuptools", "wheel")
+    IMPLICIT_PACKAGES = ("setuptools", "wheel")
 
     def __init__(self, path=None, **kwargs):
         self.path = path
@@ -127,8 +127,8 @@ class Distribution(Base):
                 log.warning("%r %r add %r raised %r", self, extra, req, exc)
                 return
 
-        # skip out for implicit build requirements
-        if extra == "build" and req in self.BUILD_IMPLICIT:
+        # skip out for implicit requirements
+        if req in self.IMPLICIT_PACKAGES:
             return
 
         # skip out if requirement is already present

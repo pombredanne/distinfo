@@ -25,7 +25,7 @@ class TestDistribution(Case):
 
     def test_repr(self):
         dist = Distribution()
-        assert repr(dist) == "<Dist UNKNOWN-0.0.0>"
+        assert repr(dist) == "<Distribution UNKNOWN-0.0.0>"
 
     def test_add_requirement(self):
         dist = Distribution()

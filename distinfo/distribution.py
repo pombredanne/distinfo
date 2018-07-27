@@ -25,8 +25,6 @@ log = logging.getLogger(__name__)
 
 class Distribution(Base):
 
-    _short_name = "Dist"
-
     IMPLICIT_PACKAGES = ("setuptools", "wheel")
 
     def __init__(self, path=None, **kwargs):

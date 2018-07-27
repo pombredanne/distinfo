@@ -64,3 +64,4 @@ class DistInfo(Collector):
         # get packages
         self.ext.packages = getattr(dist, "packages", [])
         self.ext.modules = getattr(dist, "py_modules", [])
+        self.ext.hasext = bool(getattr(dist, "ext_modules", []))

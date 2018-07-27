@@ -46,20 +46,17 @@ setup(
         "ptpython",
         "pytoml",
         "requirementslib",
-        "setuptools",
         "tox",
         "pyyaml",
     ),
-    # FIXME: nixipy misses this
     tests_require=(
-        "pytest",
+        "pytest-cov",
     ),
     extras_require=dict(
         dev=(
             "pdbpp",
-            # "prospector[with_everything]",
+            "prospector[with_everything]",
             "pycmd",
-            "pytest-cov",
             "pytest-sugar",
         ),
     ),

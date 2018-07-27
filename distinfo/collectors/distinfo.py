@@ -16,6 +16,7 @@ class DistInfo(Collector):
 
     STD_EXTRAS = dict(
         setup_requires="build",
+        install_requires="run",
         tests_require="test",
     )
 
@@ -54,6 +55,9 @@ class DistInfo(Collector):
             # fix incorrectly specified requirements (unittest2 does this)
             if isinstance(reqs, tuple) and isinstance(reqs[0], list):
                 reqs = reqs[0]
+            for req in reqs:
+                self.add_requirement(req, extra)
+        for extra, reqs in getattr(dist, "extras_require", {}).items():
             for req in reqs:
                 self.add_requirement(req, extra)
 

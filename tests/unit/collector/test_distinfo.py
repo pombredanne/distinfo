@@ -11,8 +11,12 @@ setup(
     # setup_requires packages must be present or distutils will barf, so we
     # use one that definitely is here
     setup_requires=["zzz"],
+    install_requires=["bbb"],
     # badly specified requirements, seen in unittest2
     tests_require=(["ccc"],),
+    extras_require=dict(
+        test=["ddd"],
+    ),
 )
 """
 
@@ -26,7 +30,8 @@ class TestDistInfo(Case):
         tmpdir.join("xxx").mkdir().join("__init__.py").write("")
         collector = self._collect(tmpdir)
         assert {"zzz"} == collector.requires.build
-        assert {"ccc"} == collector.requires.test
+        assert {"bbb"} == collector.requires.run
+        assert {"ccc", "ddd"} == collector.requires.test
         assert ["xxx"] == collector.ext.packages
         assert ["yyy"] == collector.ext.modules
 

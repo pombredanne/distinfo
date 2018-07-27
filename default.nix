@@ -1,9 +1,8 @@
 {
   pkgs ? import (builtins.fetchTarball {
-  url = "https://github.com/nixos/nixpkgs/archive/a8c71037e041725d40fbf2f3047347b6833b1703.tar.gz";
-  sha256 = "1z4cchcw7qgjhy0x6mnz7iqvpswc2nfjpdynxc54zpm66khfrjqw";
-}) {}
-
+    url = "https://github.com/nixos/nixpkgs/archive/a8c71037e041725d40fbf2f3047347b6833b1703.tar.gz";
+    sha256 = "1z4cchcw7qgjhy0x6mnz7iqvpswc2nfjpdynxc54zpm66khfrjqw";
+  }) {}
 , python ? pkgs.python3
 , lib ? pkgs.lib
 }:
@@ -17,6 +16,37 @@ let
 in
 with rec {
 
+  alabaster = python.pkgs.buildPythonPackage rec {
+    pname = "alabaster";
+    version = "0.7.11";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "b63b1f4dc77c074d386752ec4a8a7517600f6c0db8cd42980cae17ab7b3275d7";
+    };
+    doCheck = false;
+    meta = {
+      description = "A configurable sidebar-enabled Sphinx theme";
+      homepage = https://alabaster.readthedocs.io;
+    };
+  };
+
+  apipkg = python.pkgs.buildPythonPackage rec {
+    pname = "apipkg";
+    version = "1.5";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "37228cda29411948b422fae072f57e31d3396d2ee1c9783775980ee9c9990af6";
+    };
+    buildInputs = [ setuptools_scm ];
+    checkInputs = [ pytest ];
+    checkPhase = "py.test";
+    meta = {
+      description = "apipkg: namespace control and lazy-import mechanism";
+      homepage = https://github.com/pytest-dev/apipkg;
+      license = lib.licenses.mit;
+    };
+  };
+
   appdirs = python.pkgs.buildPythonPackage rec {
     pname = "appdirs";
     version = "1.4.3";
@@ -24,11 +54,26 @@ with rec {
       inherit pname version;
       sha256 = "9e5896d1372858f8dd3344faf4e5014d21849c756c8d5701f78f8a103b372d92";
     };
-    doCheck = false;
     meta = {
       description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\".";
       homepage = http://github.com/ActiveState/appdirs;
       license = lib.licenses.mit;
+    };
+  };
+
+  astroid = python.pkgs.buildPythonPackage rec {
+    pname = "astroid";
+    version = "2.0.1";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "218e36cf8d98a42f16214e8670819ce307fa707d1dcf7f9af84c7aede1febc7f";
+    };
+    buildInputs = [ pytest-runner ];
+    propagatedBuildInputs = [ lazy-object-proxy six typed-ast wrapt ];
+    meta = {
+      description = "A abstract syntax tree for Python with inference support.";
+      homepage = https://github.com/PyCQA/astroid;
+      license = lib.licenses.lgpl3;
     };
   };
 
@@ -39,7 +84,6 @@ with rec {
       inherit pname version;
       sha256 = "240831ea22da9ab882b551b31d4225591e5e447a68c5e188db5b89ca1d487585";
     };
-    doCheck = false;
     meta = {
       description = "Atomic file writes.";
       homepage = https://github.com/untitaker/python-atomicwrites;
@@ -54,17 +98,78 @@ with rec {
       inherit pname version;
       sha256 = "e0d0eb91441a3b53dab4d9b743eafc1ac44476296a2053b6ca3af0b139faf87b";
     };
-    installPhase = ''
-      dst=$out/${python.sitePackages}
-      mkdir -p $dst
-      export PYTHONPATH="$dst:$PYTHONPATH"
-      ${python.interpreter} setup.py install --prefix=$out
-    '';
     doCheck = false;
     meta = {
       description = "Classes Without Boilerplate";
       homepage = http://www.attrs.org/;
       license = lib.licenses.mit;
+    };
+  };
+
+  Babel = python.pkgs.buildPythonPackage rec {
+    pname = "Babel";
+    version = "2.6.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "8cba50f48c529ca3fa18cf81fa9403be176d374ac4d60738b839122dfaaa3d23";
+    };
+    propagatedBuildInputs = [ pytz ];
+    checkInputs = [ freezegun pytest-cov ];
+    checkPhase = "pytest";
+    meta = {
+      description = "Internationalization utilities";
+      homepage = http://babel.pocoo.org/;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  blinker = python.pkgs.buildPythonPackage rec {
+    pname = "blinker";
+    version = "1.4";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "471aee25f3992bd325afa3772f1063dbdbbca947a041b8b89466dc00d606f8b6";
+    };
+    checkInputs = [ nose ];
+    checkPhase = "nosetests";
+    meta = {
+      description = "Fast, simple object-to-object and broadcast signaling";
+      homepage = http://pythonhosted.org/blinker/;
+      license = lib.licenses.mit;
+    };
+  };
+
+  brotlipy = python.pkgs.buildPythonPackage rec {
+    pname = "brotlipy";
+    version = "0.7.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "36def0b859beaf21910157b4c33eb3b06d8ce459c942102f16988cca6ea164df";
+    };
+    propagatedBuildInputs = [ cffi ];
+    checkInputs = [ hypothesis pytest ];
+    checkPhase = "pytest";
+    PYTEST_ADDOPTS = "-k 'not compression'";
+    meta = {
+      description = "Python binding to the Brotli library";
+      homepage = https://github.com/python-hyper/brotlipy/;
+      license = lib.licenses.mit;
+    };
+  };
+
+  capturer = python.pkgs.buildPythonPackage rec {
+    pname = "capturer";
+    version = "2.4";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "090142a58f3f85def3a7dd55d9024d0d1a86d1a88aaf9317c0f146244994a615";
+    };
+    propagatedBuildInputs = [ humanfriendly ];
+    checkInputs = [ pytest-cov ];
+    checkPhase = "pytest capturer/tests.py";
+    meta = {
+      description = "Easily capture stdout/stderr of the current process and subprocesses";
+      homepage = https://capturer.readthedocs.io;
     };
   };
 
@@ -83,6 +188,24 @@ with rec {
     };
   };
 
+  cffi = python.pkgs.buildPythonPackage rec {
+    pname = "cffi";
+    version = "1.11.5";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "e90f17980e6ab0f3c2f3730e56d1fe9bcba1891eeea58966e89d352492cc74f4";
+    };
+    propagatedBuildInputs = [ pkgs.libffi pycparser ];
+    checkInputs = [ pytest ];
+    checkPhase = "pytest";
+    setupPyBuildFlags = [ "--parallel $NIX_BUILD_CORES" ];
+    meta = {
+      description = "Foreign Function Interface for Python calling C code.";
+      homepage = http://cffi.readthedocs.org;
+      license = lib.licenses.mit;
+    };
+  };
+
   chardet = python.pkgs.buildPythonPackage rec {
     pname = "chardet";
     version = "3.0.4";
@@ -90,7 +213,8 @@ with rec {
       inherit pname version;
       sha256 = "84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae";
     };
-    doCheck = false;
+    checkInputs = [ hypothesis pytest ];
+    checkPhase = "pytest";
     meta = {
       description = "Universal encoding detector for Python 2 and 3";
       homepage = https://github.com/chardet/chardet;
@@ -106,11 +230,28 @@ with rec {
       sha256 = "f15516df478d5a56180fbf80e68f206010e6d160fc39fa508b65e035fd75130b";
     };
     buildInputs = [ pkgs.glibcLocales ];
+    checkInputs = [ pytest ];
+    checkPhase = "pytest";
     LANG = "en_US.UTF-8";
-    doCheck = false;
+    PYTEST_ADDOPTS = "-k 'not test_legacy_callbacks'";
     meta = {
       description = "A simple wrapper around optparse for powerful command line utilities.";
       homepage = http://github.com/mitsuhiko/click;
+    };
+  };
+
+  colorama = python.pkgs.buildPythonPackage rec {
+    pname = "colorama";
+    version = "0.3.9";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "48eb22f4f8461b1df5734a074b57042430fb06e1d61bd1e11b078c0fe6d7a1f1";
+    };
+    doCheck = false;
+    meta = {
+      description = "Cross-platform colored terminal text.";
+      homepage = https://github.com/tartley/colorama;
+      license = lib.licenses.bsdOriginal;
     };
   };
 
@@ -122,7 +263,8 @@ with rec {
       sha256 = "b869a2dda3fa88154b9dd850e27828d8755bfab5a838a1c97fbc850c6e377c36";
     };
     propagatedBuildInputs = [ humanfriendly ];
-    doCheck = false;
+    checkInputs = [ capturer mock pkgs.utillinux pytest-cov verboselogs ];
+    checkPhase = "PATH=$out/bin:$PATH pytest coloredlogs/tests.py";
     meta = {
       description = "Colored terminal output for Python's logging module";
       homepage = https://coloredlogs.readthedocs.io;
@@ -153,10 +295,25 @@ with rec {
       sha256 = "56e448f051a201c5ebbaa86a5efd0ca90d327204d8b059ab25ad0f35fbfd79f1";
     };
     doCheck = false;
+    setupPyBuildFlags = [ "--parallel $NIX_BUILD_CORES" ];
     meta = {
       description = "Code coverage measurement for Python";
       homepage = https://bitbucket.org/ned/coveragepy;
       license = lib.licenses.asl20;
+    };
+  };
+
+  decorator = python.pkgs.buildPythonPackage rec {
+    pname = "decorator";
+    version = "4.3.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "c39efa13fbdeb4506c476c9b3babf6a718da943dab7811c206005a4a956c080c";
+    };
+    meta = {
+      description = "Better living through Python with decorators";
+      homepage = https://github.com/micheles/decorator;
+      license = lib.licenses.bsd3;
     };
   };
 
@@ -176,6 +333,40 @@ with rec {
     };
   };
 
+  Django = python.pkgs.buildPythonPackage rec {
+    pname = "Django";
+    version = "2.0.7";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "97886b8a13bbc33bfeba2ff133035d3eca014e2309dff2b6da0bdfc0b8656613";
+    };
+    propagatedBuildInputs = [ pytz ];
+    doCheck = false;
+    meta = {
+      description = "A high-level Python Web framework that encourages rapid development and clean, pragmatic design.";
+      homepage = https://www.djangoproject.com/;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  dnspython = python.pkgs.buildPythonPackage rec {
+    pname = "dnspython";
+    version = "1.15.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "40f563e1f7a7b80dc5a4e76ad75c23da53d62f1e15e6e517293b04e1f84ead7c";
+      extension = "zip";
+    };
+    checkInputs = [ pytest ];
+    checkPhase = "pytest";
+    PYTEST_ADDOPTS = "-k 'not test_zone'";
+    meta = {
+      description = "DNS toolkit";
+      homepage = http://www.dnspython.org;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
   docopt = python.pkgs.buildPythonPackage rec {
     pname = "docopt";
     version = "0.6.2";
@@ -191,6 +382,104 @@ with rec {
     };
   };
 
+  docutils = python.pkgs.buildPythonPackage rec {
+    pname = "docutils";
+    version = "0.14";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "51e64ef2ebfb29cae1faa133b3710143496eca21c530f3f71424d77687764274";
+    };
+    checkPhase = "${python.interpreter} test3/alltests.py";
+    meta = {
+      description = "Docutils -- Python Documentation Utilities";
+      homepage = http://docutils.sourceforge.net/;
+      license = "public domain, Python, 2-Clause BSD, GPL 3 (see COPYING.txt)";
+    };
+  };
+
+  dodgy = python.pkgs.buildPythonPackage rec {
+    pname = "dodgy";
+    version = "0.1.9";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "65e13cf878d7aff129f1461c13cb5fd1bb6dfe66bb5327e09379c3877763280c";
+    };
+    doCheck = false;
+    meta = {
+      description = "Dodgy: Searches for dodgy looking lines in Python code";
+      homepage = https://github.com/landscapeio/dodgy;
+      license = lib.licenses.mit;
+    };
+  };
+
+  email_validator = python.pkgs.buildPythonPackage rec {
+    pname = "email_validator";
+    version = "1.0.2";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "669eaae98d86dbd0ab62ab2f5fbc95d01cb28f8e038aa30ab165b244130949c9";
+    };
+    propagatedBuildInputs = [ dnspython idna ];
+    doCheck = false;
+    meta = {
+      description = "A robust email syntax and deliverability validation library for Python 2.x/3.x.";
+      homepage = https://github.com/JoshData/python-email-validator;
+      license = "CC0 (copyright waived)";
+    };
+  };
+
+  execnet = python.pkgs.buildPythonPackage rec {
+    pname = "execnet";
+    version = "1.5.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "a7a84d5fa07a089186a329528f127c9d73b9de57f1a1131b82bb5320ee651f6a";
+    };
+    buildInputs = [ setuptools_scm ];
+    propagatedBuildInputs = [ apipkg ];
+    checkInputs = [ pytest-timeout ];
+    checkPhase = "py.test testing";
+    PYTEST_ADDOPTS = "-k 'not test_close_initiating_remote_no_error'";
+    meta = {
+      description = "execnet: rapid multi-Python deployment";
+      homepage = http://codespeak.net/execnet;
+      license = lib.licenses.mit;
+    };
+  };
+
+  factory_boy = python.pkgs.buildPythonPackage rec {
+    pname = "factory_boy";
+    version = "2.11.1";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "6f25cc4761ac109efd503f096e2ad99421b1159f01a29dbb917359dcd68e08ca";
+    };
+    propagatedBuildInputs = [ Faker ];
+    doCheck = false;
+    meta = {
+      description = "A versatile test fixtures replacement based on thoughtbot's factory_bot for Ruby.";
+      homepage = https://github.com/FactoryBoy/factory_boy;
+      license = lib.licenses.mit;
+    };
+  };
+
+  Faker = python.pkgs.buildPythonPackage rec {
+    pname = "Faker";
+    version = "0.8.17";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "0e9a1227a3a0f3297a485715e72ee6eb77081b17b629367042b586e38c03c867";
+    };
+    propagatedBuildInputs = [ python-dateutil text-unidecode ];
+    checkInputs = [ email_validator mock UkPostcodeParser ];
+    checkPhase = "pytest";
+    meta = {
+      description = "Faker is a Python package that generates fake data for you.";
+      homepage = https://github.com/joke2k/faker;
+      license = lib.licenses.mit;
+    };
+  };
+
   fancycompleter = python.pkgs.buildPythonPackage rec {
     pname = "fancycompleter";
     version = "0.8";
@@ -199,7 +488,8 @@ with rec {
       sha256 = "d2522f1f3512371f295379c4c0d1962de06762eb586c199620a2a5d423539b12";
     };
     buildInputs = [ setuptools_scm ];
-    doCheck = false;
+    checkInputs = [ pytest ];
+    checkPhase = "py.test -v -rs";
     meta = {
       description = "colorful TAB completion for Python prompt";
       homepage = http://bitbucket.org/antocuni/fancycompleter;
@@ -222,6 +512,129 @@ with rec {
     };
   };
 
+  flake8 = python.pkgs.buildPythonPackage rec {
+    pname = "flake8";
+    version = "3.5.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "7253265f7abd8b313e3892944044a365e3f4ac3fcdcfb4298f55ee9ddf188ba0";
+    };
+    buildInputs = [ pytest-runner ];
+    propagatedBuildInputs = [ mccabe pycodestyle pyflakes ];
+    checkInputs = [ coverage mock ];
+    checkPhase = ''
+      coverage run --parallel-mode -m pytest
+      coverage combine
+      coverage report -m
+    '';
+    meta = {
+      description = "the modular source code checker: pep8, pyflakes and co";
+      homepage = https://gitlab.com/pycqa/flake8;
+      license = lib.licenses.mit;
+    };
+  };
+
+  flake8-polyfill = python.pkgs.buildPythonPackage rec {
+    pname = "flake8-polyfill";
+    version = "1.0.2";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "e44b087597f6da52ec6393a709e7108b2905317d0c0b744cdca6208e670d8eda";
+    };
+    propagatedBuildInputs = [ flake8 ];
+    checkInputs = [ mock pep8 pytest ];
+    checkPhase = "pytest";
+    meta = {
+      description = "Polyfill package for Flake8 plugins";
+      homepage = https://gitlab.com/pycqa/flake8-polyfill;
+      license = lib.licenses.mit;
+    };
+  };
+
+  Flask = python.pkgs.buildPythonPackage rec {
+    pname = "Flask";
+    version = "1.0.2";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "2271c0070dbcb5275fad4a82e29f23ab92682dc45f9dfbc22c02ba9b9322ce48";
+    };
+    buildInputs = [ pkgs.glibcLocales ];
+    propagatedBuildInputs = [ click itsdangerous Jinja2 Werkzeug ];
+    checkInputs = [ blinker greenlet pytest ];
+    checkPhase = "pytest";
+    LANG = "en_US.UTF-8";
+    meta = {
+      description = "A simple framework for building complex web applications.";
+      homepage = https://www.palletsprojects.com/p/flask/;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  freezegun = python.pkgs.buildPythonPackage rec {
+    pname = "freezegun";
+    version = "0.3.10";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "703caac155dcaad61f78de4cb0666dca778d854dfb90b3699930adee0559a622";
+    };
+    propagatedBuildInputs = [ python-dateutil ];
+    checkInputs = [ mock nose ];
+    checkPhase = "nosetests";
+    meta = {
+      description = "Let your Python tests travel through time";
+      homepage = https://github.com/spulec/freezegun;
+      license = lib.licenses.asl20;
+    };
+  };
+
+  frosted = python.pkgs.buildPythonPackage rec {
+    pname = "frosted";
+    version = "1.4.1";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "d1e5d2b43a064b33c289b9a986a7425fd9a36bed8f519ca430ac7a0915e32b51";
+    };
+    propagatedBuildInputs = [ pies ];
+    doCheck = false;
+    meta = {
+      description = "A passive Python syntax checker";
+      homepage = https://github.com/timothycrosley/frosted;
+      license = lib.licenses.mit;
+    };
+  };
+
+  greenlet = python.pkgs.buildPythonPackage rec {
+    pname = "greenlet";
+    version = "0.4.14";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "f1cc268a15ade58d9a0c04569fe6613e19b8b0345b64453064e2c3c6d79051af";
+    };
+    checkInputs = [ pytest ];
+    checkPhase = "pytest";
+    setupPyBuildFlags = [ "--parallel $NIX_BUILD_CORES" ];
+    meta = {
+      description = "Lightweight in-process concurrent programming";
+      homepage = https://github.com/python-greenlet/greenlet;
+      license = lib.licenses.mit;
+    };
+  };
+
+  httpbin = python.pkgs.buildPythonPackage rec {
+    pname = "httpbin";
+    version = "0.7.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "cbb37790c91575f4f15757f42ad41d9f729eb227d5edbe89e4ec175486db8dfa";
+    };
+    propagatedBuildInputs = [ brotlipy decorator raven six ];
+    meta = {
+      description = "HTTP Request and Response Service";
+      homepage = https://github.com/requests/httpbin;
+      license = lib.licenses.mit;
+    };
+  };
+
   humanfriendly = python.pkgs.buildPythonPackage rec {
     pname = "humanfriendly";
     version = "4.16.1";
@@ -237,6 +650,22 @@ with rec {
     };
   };
 
+  hypothesis = python.pkgs.buildPythonPackage rec {
+    pname = "hypothesis";
+    version = "3.66.9";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "ebf771edbeaeea9fa4162556925f13cfcc41a2358adf73e69ee663197eb6ad99";
+    };
+    propagatedBuildInputs = [ attrs coverage ];
+    doCheck = false;
+    meta = {
+      description = "A library for property based testing";
+      homepage = https://github.com/HypothesisWorks/hypothesis/tree/master/hypothesis-python;
+      license = lib.licenses.mpl20;
+    };
+  };
+
   idna = python.pkgs.buildPythonPackage rec {
     pname = "idna";
     version = "2.7";
@@ -244,11 +673,24 @@ with rec {
       inherit pname version;
       sha256 = "684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16";
     };
-    doCheck = false;
     meta = {
       description = "Internationalized Domain Names in Applications (IDNA)";
       homepage = https://github.com/kjd/idna;
       license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  imagesize = python.pkgs.buildPythonPackage rec {
+    pname = "imagesize";
+    version = "1.0.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "5b326e4678b6925158ccc66a9fa3122b6106d7c876ee32d7de6ce59385b96315";
+    };
+    meta = {
+      description = "Getting image size from png/jpeg/jpeg2000/gif file";
+      homepage = https://github.com/shibukawa/imagesize_py;
+      license = lib.licenses.mit;
     };
   };
 
@@ -259,11 +701,42 @@ with rec {
       inherit pname version;
       sha256 = "49c4b20e1f38aa5cf109ddcd39647ac419f928512c869dc01d5c7098eddede82";
     };
-    doCheck = false;
+    checkInputs = [ pytest ];
+    checkPhase = "py.test --verbose iso8601";
     meta = {
       description = "Simple module to parse ISO 8601 dates";
       homepage = https://bitbucket.org/micktwomey/pyiso8601;
       license = lib.licenses.mit;
+    };
+  };
+
+  isort = python.pkgs.buildPythonPackage rec {
+    pname = "isort";
+    version = "4.3.4";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "b9c40e9750f3d77e6e4d441d8b0266cf555e7cdabdcff33c4fd06366ca761ef8";
+    };
+    checkInputs = [ mock pytest ];
+    checkPhase = python.pkgs.isort.checkPhase;
+    meta = {
+      description = "A Python utility / library to sort Python imports.";
+      homepage = https://github.com/timothycrosley/isort;
+      license = lib.licenses.mit;
+    };
+  };
+
+  itsdangerous = python.pkgs.buildPythonPackage rec {
+    pname = "itsdangerous";
+    version = "0.24";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "cbb3fcf8d3e33df861709ecaf89d9e6629cff0a217bc2848f1b41cd30d360519";
+    };
+    checkPhase = "${python.interpreter} tests.py";
+    meta = {
+      description = "Various helpers to pass trusted data to untrusted environments and back.";
+      homepage = http://github.com/mitsuhiko/itsdangerous;
     };
   };
 
@@ -275,11 +748,112 @@ with rec {
       sha256 = "b409ed0f6913a701ed474a614a3bb46e6953639033e31f769ca7581da5bd1ec1";
     };
     propagatedBuildInputs = [ parso ];
-    doCheck = false;
+    checkInputs = [ colorama numpydoc pytest-cache ];
+    checkPhase = "py.test jedi test";
     meta = {
       description = "An autocompletion tool for Python that can be used for text editors.";
       homepage = https://github.com/davidhalter/jedi;
       license = lib.licenses.mit;
+    };
+  };
+
+  Jinja2 = python.pkgs.buildPythonPackage rec {
+    pname = "Jinja2";
+    version = "2.10";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "f84be1bb0040caca4cea721fcbbbbd61f9be9464ca236387158b0feea01914a4";
+    };
+    propagatedBuildInputs = [ MarkupSafe ];
+    checkInputs = [ pytest ];
+    checkPhase = "pytest";
+    meta = {
+      description = "A small but fast and easy to use stand-alone template engine written in pure python.";
+      homepage = http://jinja.pocoo.org/;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  lazy-object-proxy = python.pkgs.buildPythonPackage rec {
+    pname = "lazy-object-proxy";
+    version = "1.3.1";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "eb91be369f945f10d3a49f5f9be8b3d0b93a4c2be8f8a5b83b0571b8123e0a7a";
+    };
+    checkInputs = [
+      Django
+      objproxies
+      pytest-benchmark
+      pytest-capturelog
+      pytest-cov
+    ];
+    checkPhase = "py.test --cov --cov-report=term-missing -vv";
+    setupPyBuildFlags = [ "--inplace" "--parallel $NIX_BUILD_CORES" ];
+    meta = {
+      description = "A fast and thorough lazy object proxy.";
+      homepage = https://github.com/ionelmc/python-lazy-object-proxy;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  linecache2 = python.pkgs.buildPythonPackage rec {
+    pname = "linecache2";
+    version = "1.0.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "4b26ff4e7110db76eeb6f5a7b64a82623839d595c2038eeda662f2a2db78e97c";
+    };
+    buildInputs = [ pbr ];
+    doCheck = false;
+    meta = {
+      description = "Backports of the linecache module";
+      homepage = https://github.com/testing-cabal/linecache2;
+    };
+  };
+
+  MarkupSafe = python.pkgs.buildPythonPackage rec {
+    pname = "MarkupSafe";
+    version = "1.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "a6be69091dac236ea9c6bc7d012beab42010fa914c459791d627dad4910eb665";
+    };
+    meta = {
+      description = "Implements a XML/HTML/XHTML Markup safe string for Python";
+      homepage = http://github.com/pallets/markupsafe;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  mccabe = python.pkgs.buildPythonPackage rec {
+    pname = "mccabe";
+    version = "0.6.1";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f";
+    };
+    buildInputs = [ pytest-runner ];
+    meta = {
+      description = "McCabe checker, plugin for flake8";
+      homepage = https://github.com/pycqa/mccabe;
+      license = lib.licenses.mit;
+    };
+  };
+
+  mock = python.pkgs.buildPythonPackage rec {
+    pname = "mock";
+    version = "2.0.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "b158b6df76edd239b8208d481dc46b6afd45a846b7812ff0ce58971cf5bc8bba";
+    };
+    propagatedBuildInputs = [ pbr six ];
+    checkInputs = [ unittest2 ];
+    checkPhase = "unit2 discover";
+    meta = {
+      description = "Rolling backport of unittest.mock for all Pythons";
+      homepage = https://github.com/testing-cabal/mock;
     };
   };
 
@@ -291,7 +865,7 @@ with rec {
       sha256 = "2b6b9893337bfd9166bee6a62c2b0c9fe7735dcf85948b387ec8cba30e85d8e8";
     };
     propagatedBuildInputs = [ six ];
-    doCheck = false;
+    checkPhase = "${python.interpreter} -m unittest discover -v";
     meta = {
       description = "More routines for operating on iterables, beyond itertools";
       homepage = https://github.com/erikrose/more-itertools;
@@ -315,6 +889,89 @@ with rec {
     };
   };
 
+  mypy = python.pkgs.buildPythonPackage rec {
+    pname = "mypy";
+    version = "0.620";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "c770605a579fdd4a014e9f0a34b6c7a36ce69b08100ff728e96e27445cef3b3c";
+    };
+    propagatedBuildInputs = [ typed-ast ];
+    doCheck = false;
+    meta = {
+      description = "Optional static typing for Python";
+      homepage = http://www.mypy-lang.org/;
+      license = lib.licenses.mit;
+    };
+  };
+
+  nose = python.pkgs.buildPythonPackage rec {
+    pname = "nose";
+    version = "1.3.7";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "f1bffef9cbc82628f6e7d7b40d7e255aefaa1adb6a1b1d26c69a8b79e6208a98";
+    };
+    doCheck = false;
+    meta = {
+      description = "nose extends unittest to make testing easier";
+      homepage = http://readthedocs.org/docs/nose/;
+      license = lib.licenses.lgpl3;
+    };
+  };
+
+  numpy = python.pkgs.buildPythonPackage rec {
+    pname = "numpy";
+    version = "1.15.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "f28e73cf18d37a413f7d5de35d024e6b98f14566a10d82100f9dc491a7d449f9";
+      extension = "zip";
+    };
+    buildInputs = [ pkgs.blas pkgs.gfortran ];
+    propagatedBuildInputs = [ pytest ];
+    checkInputs = [ nose ];
+    checkPhase = python.pkgs.numpy.checkPhase;
+    NOSE_EXCLUDE = python.pkgs.numpy.NOSE_EXCLUDE;
+    enableParallelBuilding = python.pkgs.numpy.enableParallelBuilding;
+    passthru = python.pkgs.numpy.passthru;
+    patches = python.pkgs.numpy.patches;
+    postPatch = python.pkgs.numpy.postPatch;
+    preBuild = python.pkgs.numpy.preBuild;
+    preConfigure = python.pkgs.numpy.preConfigure;
+  };
+
+  numpydoc = python.pkgs.buildPythonPackage rec {
+    pname = "numpydoc";
+    version = "0.8.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "61f4bf030937b60daa3262e421775838c945dcdd671f37b69e8e4854c7eb5ffd";
+    };
+    propagatedBuildInputs = [ nose Sphinx ];
+    checkPhase = "nosetests";
+    meta = {
+      description = "Sphinx extension to support docstrings in Numpy format";
+      homepage = https://numpydoc.readthedocs.io;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  objproxies = python.pkgs.buildPythonPackage rec {
+    pname = "objproxies";
+    version = "0.9.4";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "6d68281b3b44dbda51ee11e460b50e9d0025ea68e16e3fb192fcf9250f229426";
+    };
+    doCheck = false;
+    meta = {
+      description = "General purpose proxy and wrapper types";
+      homepage = http://github.com/soulrebel/objproxies;
+      license = "PSF or ZPL";
+    };
+  };
+
   packaging = python.pkgs.buildPythonPackage rec {
     pname = "packaging";
     version = "17.1";
@@ -323,7 +980,11 @@ with rec {
       sha256 = "f019b770dd64e585a99714f1fd5e01c7a8f11b45635aa953fd41c689a657375b";
     };
     propagatedBuildInputs = [ pyparsing six ];
-    doCheck = false;
+    checkInputs = [ coverage pretend pytest ];
+    checkPhase = ''
+      ${python.interpreter} -m coverage run --source packaging/ -m pytest --strict
+      ${python.interpreter} -m coverage report -m --fail-under 100
+    '';
     meta = {
       description = "Core utilities for Python packages";
       homepage = https://github.com/pypa/packaging;
@@ -338,11 +999,26 @@ with rec {
       inherit pname version;
       sha256 = "35704a43a3c113cce4de228ddb39aab374b8004f4f2407d070b6a2ca784ce8a2";
     };
-    doCheck = false;
+    checkInputs = [ pytest-cache ];
+    checkPhase = "pytest parso test";
     meta = {
       description = "A Python Parser";
       homepage = https://github.com/davidhalter/parso;
       license = lib.licenses.mit;
+    };
+  };
+
+  pbr = python.pkgs.buildPythonPackage rec {
+    pname = "pbr";
+    version = "4.2.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "1b8be50d938c9bb75d0eaf7eda111eec1bf6dc88a62a6412e33bf077457e0f45";
+    };
+    doCheck = false;
+    meta = {
+      description = "Python Build Reasonableness";
+      homepage = https://docs.openstack.org/pbr/latest/;
     };
   };
 
@@ -360,6 +1036,70 @@ with rec {
       description = "pdb++, a drop-in replacement for pdb";
       homepage = http://github.com/antocuni/pdb;
       license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  pep8 = python.pkgs.buildPythonPackage rec {
+    pname = "pep8";
+    version = "1.7.1";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "fe249b52e20498e59e0b5c5256aa52ee99fc295b26ec9eaa85776ffdb9fe6374";
+    };
+    checkInputs = [ pytest ];
+    checkPhase = "pytest";
+    PYTEST_ADDOPTS = "-k 'not test_check_diff'";
+    meta = {
+      description = "Python style guide checker";
+      homepage = http://pep8.readthedocs.org/;
+      license = lib.licenses.mit;
+    };
+  };
+
+  pep8-naming = python.pkgs.buildPythonPackage rec {
+    pname = "pep8-naming";
+    version = "0.7.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "624258e0dd06ef32a9daf3c36cc925ff7314da7233209c5b01f7e5cdd3c34826";
+    };
+    propagatedBuildInputs = [ flake8-polyfill ];
+    doCheck = false;
+    meta = {
+      description = "Check PEP-8 naming conventions, plugin for flake8";
+      homepage = https://github.com/PyCQA/pep8-naming;
+      license = lib.licenses.mit;
+    };
+  };
+
+  pexpect = python.pkgs.buildPythonPackage rec {
+    pname = "pexpect";
+    version = "4.6.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "2a8e88259839571d1251d278476f3eec5db26deb73a70be5ed5dc5435e418aba";
+    };
+    propagatedBuildInputs = [ ptyprocess ];
+    doCheck = false;
+    meta = {
+      description = "Pexpect allows easy control of interactive console applications.";
+      homepage = https://pexpect.readthedocs.io/;
+      license = "ISC license";
+    };
+  };
+
+  pies = python.pkgs.buildPythonPackage rec {
+    pname = "pies";
+    version = "2.6.7";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "e8a76923ce0e0f605240901983fe492814a65d3d803efe3013a0e1815b75e4e9";
+    };
+    doCheck = false;
+    meta = {
+      description = "The simplest way to write one program that runs on both Python 2 and Python 3.";
+      homepage = https://github.com/timothycrosley/pies;
+      license = lib.licenses.mit;
     };
   };
 
@@ -394,6 +1134,21 @@ with rec {
     };
   };
 
+  pretend = python.pkgs.buildPythonPackage rec {
+    pname = "pretend";
+    version = "1.0.9";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "c90eb810cde8ebb06dafcb8796f9a95228ce796531bc806e794c2f4649aa1b10";
+    };
+    doCheck = false;
+    meta = {
+      description = "A library for stubbing in Python";
+      homepage = https://github.com/alex/pretend;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
   prompt_toolkit = python.pkgs.buildPythonPackage rec {
     pname = "prompt_toolkit";
     version = "1.0.15";
@@ -402,8 +1157,13 @@ with rec {
       sha256 = "858588f1983ca497f1cf4ffde01d978a3ea02b01c8a26a8bbc5cd2e66d816917";
     };
     propagatedBuildInputs = [ six wcwidth ];
+    checkInputs = [ pytest-xdist ];
     patchPhase = "rm prompt_toolkit/win32_types.py";
-    doCheck = false;
+    checkPhase = ''
+      PYTEST_ADDOPTS="$PYTEST_ADDOPTS -n$NIX_BUILD_CORES"
+      pytest
+    '';
+    PYTEST_ADDOPTS = "-k 'not test_pathcompleter_can_expanduser'";
     meta = {
       description = "Library for building powerful interactive command lines in Python";
       homepage = https://github.com/jonathanslenders/python-prompt-toolkit;
@@ -418,11 +1178,40 @@ with rec {
       sha256 = "19e1f230f95691ae74123fa43c6928d0f0cc464e841d6375941cda4a0585162f";
     };
     propagatedBuildInputs = [ humanfriendly verboselogs ];
-    doCheck = false;
+    checkInputs = [ coloredlogs pytest-cov ];
+    checkPhase = "pytest property_manager/tests.py";
     meta = {
       description = "Useful property variants for Python programming (required properties, writable properties, cached properties, etc)";
       homepage = https://property-manager.readthedocs.org;
       license = lib.licenses.mit;
+    };
+  };
+
+  prospector = python.pkgs.buildPythonPackage rec {
+    pname = "prospector";
+    version = "1.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "239e0a5c5aaf6b0ad957016dadce289a7c175dc58b1d70759427ab6b045b6903";
+    };
+    propagatedBuildInputs = [
+      dodgy
+      frosted
+      mypy
+      pep8-naming
+      pydocstyle
+      pylint-common
+      pyroma
+      PyYAML
+      requirements-detector
+      setoptconf
+      vulture
+    ];
+    doCheck = false;
+    meta = {
+      description = "Prospector: python static analysis tool";
+      homepage = http://prospector.readthedocs.io;
+      license = lib.licenses.gpl2;
     };
   };
 
@@ -438,6 +1227,19 @@ with rec {
     meta = {
       description = "Python REPL build on top of prompt_toolkit";
       homepage = https://github.com/jonathanslenders/ptpython;
+    };
+  };
+
+  ptyprocess = python.pkgs.buildPythonPackage rec {
+    pname = "ptyprocess";
+    version = "0.6.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "923f299cc5ad920c68f2bc0bc98b75b9f838b93b599941a6b63ddbc2476394c0";
+    };
+    meta = {
+      description = "Run a subprocess in a pseudo terminal";
+      homepage = https://github.com/pexpect/ptyprocess;
     };
   };
 
@@ -457,6 +1259,20 @@ with rec {
     };
   };
 
+  py-cpuinfo = python.pkgs.buildPythonPackage rec {
+    pname = "py-cpuinfo";
+    version = "4.0.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "6615d4527118d4ea1db4d86dac4340725b3906aa04bf36b7902f7af4425fb25f";
+    };
+    meta = {
+      description = "Get CPU info with pure Python 2 & 3";
+      homepage = https://github.com/workhorsy/py-cpuinfo;
+      license = lib.licenses.mit;
+    };
+  };
+
   pycmd = python.pkgs.buildPythonPackage rec {
     pname = "pycmd";
     version = "1.2";
@@ -468,6 +1284,65 @@ with rec {
     doCheck = false;
     meta = {
       description = "pycmd: tools for managing/searching Python related files.";
+      license = lib.licenses.mit;
+    };
+  };
+
+  pycodestyle = python.pkgs.buildPythonPackage rec {
+    pname = "pycodestyle";
+    version = "2.3.1";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "682256a5b318149ca0d2a9185d365d8864a768a28db66a84a2ea946bcc426766";
+    };
+    meta = {
+      description = "Python style guide checker";
+      homepage = https://pycodestyle.readthedocs.io/;
+      license = lib.licenses.mit;
+    };
+  };
+
+  pycparser = python.pkgs.buildPythonPackage rec {
+    pname = "pycparser";
+    version = "2.18";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "99a8ca03e29851d96616ad0404b4aad7d9ee16f25c9f9708a11faf2810f7b226";
+    };
+    checkPhase = "${python.interpreter} tests/all_tests.py";
+    meta = {
+      description = "C parser in Python";
+      homepage = https://github.com/eliben/pycparser;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  pydocstyle = python.pkgs.buildPythonPackage rec {
+    pname = "pydocstyle";
+    version = "2.1.1";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "4d5bcde961107873bae621f3d580c3e35a426d3687ffc6f8fb356f6628da5a97";
+    };
+    propagatedBuildInputs = [ six snowballstemmer ];
+    doCheck = false;
+    meta = {
+      description = "Python docstring style checker";
+      homepage = https://github.com/PyCQA/pydocstyle/;
+      license = lib.licenses.mit;
+    };
+  };
+
+  pyflakes = python.pkgs.buildPythonPackage rec {
+    pname = "pyflakes";
+    version = "1.6.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "8d616a382f243dbf19b54743f280b80198be0bca3a5396f1d2e1fca6223e8805";
+    };
+    meta = {
+      description = "passive checker of Python programs";
+      homepage = https://github.com/PyCQA/pyflakes;
       license = lib.licenses.mit;
     };
   };
@@ -487,6 +1362,60 @@ with rec {
     };
   };
 
+  pylint = python.pkgs.buildPythonPackage rec {
+    pname = "pylint";
+    version = "2.0.1";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "2c90a24bee8fae22ac98061c896e61f45c5b73c2e0511a4bf53f99ba56e90434";
+    };
+    buildInputs = [ pytest-runner ];
+    propagatedBuildInputs = [ astroid isort mccabe ];
+    checkInputs = [ pytest-xdist ];
+    checkPhase = ''
+      PYTEST_ADDOPTS="$PYTEST_ADDOPTS -n$NIX_BUILD_CORES"
+      pytest
+    '';
+    PYTEST_ADDOPTS = "-k 'not test_good_comprehension_checks'";
+    meta = {
+      description = "python code static checker";
+      homepage = https://github.com/PyCQA/pylint;
+      license = lib.licenses.gpl3;
+    };
+  };
+
+  pylint-common = python.pkgs.buildPythonPackage rec {
+    pname = "pylint-common";
+    version = "0.2.5";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "3276b9e4db16f41cee656c78c74cfef3da383e8301e5b3b91146586ae5b53659";
+    };
+    propagatedBuildInputs = [ pylint-plugin-utils ];
+    doCheck = false;
+    meta = {
+      description = "pylint-common is a Pylint plugin to improve Pylint error analysis of the standard Python library";
+      homepage = https://github.com/landscapeio/pylint-common;
+      license = lib.licenses.gpl2;
+    };
+  };
+
+  pylint-plugin-utils = python.pkgs.buildPythonPackage rec {
+    pname = "pylint-plugin-utils";
+    version = "0.4";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "8ad25a82bcce390d1d6b7c006c123e0cb18051839c9df7b8bdb7823c53fe676e";
+    };
+    propagatedBuildInputs = [ pylint ];
+    doCheck = false;
+    meta = {
+      description = "Utilities and helpers for writing Pylint plugins";
+      homepage = https://github.com/landscapeio/pylint-plugin-utils;
+      license = lib.licenses.gpl2;
+    };
+  };
+
   pyparsing = python.pkgs.buildPythonPackage rec {
     pname = "pyparsing";
     version = "2.2.0";
@@ -502,6 +1431,36 @@ with rec {
     };
   };
 
+  pyroma = python.pkgs.buildPythonPackage rec {
+    pname = "pyroma";
+    version = "2.3.1";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "664faca7691a372360cd6ecf04d459c1b7c221013d8e965e0ae83f82a07b57a7";
+    };
+    propagatedBuildInputs = [ docutils ];
+    meta = {
+      description = "Test your project's packaging friendliness";
+      homepage = https://github.com/regebro/pyroma;
+      license = lib.licenses.mit;
+    };
+  };
+
+  PySocks = python.pkgs.buildPythonPackage rec {
+    pname = "PySocks";
+    version = "1.6.8";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "3fe52c55890a248676fd69dc9e3c4e811718b777834bcaab7a8125cf9deac672";
+    };
+    doCheck = false;
+    meta = {
+      description = "A Python SOCKS client module. See https://github.com/Anorov/PySocks for more information.";
+      homepage = https://github.com/Anorov/PySocks;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
   pytest = python.pkgs.buildPythonPackage rec {
     pname = "pytest";
     version = "3.6.3";
@@ -510,20 +1469,61 @@ with rec {
       sha256 = "0453c8676c2bee6feb0434748b068d5510273a916295fd61d306c4f22fbfd752";
     };
     buildInputs = [ setuptools_scm ];
-    propagatedBuildInputs = [
-      atomicwrites
-      attrs
-      more-itertools
-      pluggy
-      py
-      setuptools
-    ];
+    propagatedBuildInputs = [ atomicwrites attrs more-itertools pluggy py ];
+    checkInputs = [ hypothesis mock nose ];
     patchPhase = "rm testing/test_argcomplete.py";
-    postInstall = "PATH=$out/bin:$PATH";
-    doCheck = false;
+    checkPhase = "pytest --lsof -ra testing";
+    preBuild = "PATH=$out/bin:$PATH";
     meta = {
       description = "pytest: simple powerful testing with Python";
       homepage = http://pytest.org;
+      license = lib.licenses.mit;
+    };
+  };
+
+  pytest-benchmark = python.pkgs.buildPythonPackage rec {
+    pname = "pytest-benchmark";
+    version = "3.1.1";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "185526b10b7cf1804cb0f32ac0653561ef2f233c6e50a9b3d8066a9757e36480";
+    };
+    propagatedBuildInputs = [ py-cpuinfo pytest ];
+    doCheck = false;
+    meta = {
+      description = "A ``py.test`` fixture for benchmarking code. It will group the tests into rounds that are calibrated to the chosen timer. See calibration_ and FAQ_.";
+      homepage = https://github.com/ionelmc/pytest-benchmark;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  pytest-cache = python.pkgs.buildPythonPackage rec {
+    pname = "pytest-cache";
+    version = "1.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "be7468edd4d3d83f1e844959fd6e3fd28e77a481440a7118d430130ea31b07a9";
+    };
+    propagatedBuildInputs = [ execnet pytest ];
+    doCheck = false;
+    meta = {
+      description = "pytest plugin with mechanisms for caching across test runs";
+      homepage = http://bitbucket.org/hpk42/pytest-cache/;
+    };
+  };
+
+  pytest-capturelog = python.pkgs.buildPythonPackage rec {
+    pname = "pytest-capturelog";
+    version = "0.7";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "b6e8d5189b39462109c2188e6b512d6cc7e66d62bb5be65389ed50e96d22000d";
+    };
+    propagatedBuildInputs = [ py ];
+    doCheck = false;
+    meta = {
+      description = "py.test plugin to capture log messages";
+      homepage = http://bitbucket.org/memedough/pytest-capturelog/overview;
       license = lib.licenses.mit;
     };
   };
@@ -544,6 +1544,93 @@ with rec {
     };
   };
 
+  pytest-forked = python.pkgs.buildPythonPackage rec {
+    pname = "pytest-forked";
+    version = "0.2";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "e4500cd0509ec4a26535f7d4112a8cc0f17d3a41c29ffd4eab479d2a55b30805";
+    };
+    buildInputs = [ setuptools_scm ];
+    propagatedBuildInputs = [ pytest ];
+    checkInputs = [ pycmd ];
+    patchPhase = "py.cleanup -a";
+    checkPhase = "py.test";
+    meta = {
+      description = "run tests in isolated forked subprocesses";
+      homepage = https://github.com/pytest-dev/pytest-forked;
+      license = lib.licenses.mit;
+    };
+  };
+
+  pytest-httpbin = python.pkgs.buildPythonPackage rec {
+    pname = "pytest-httpbin";
+    version = "0.0.7";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "03af8a7055c8bbcb68b14d9a14c103c82c97aeb86a8f1b29cd63d83644c2f021";
+    };
+    propagatedBuildInputs = [ httpbin ];
+    doCheck = false;
+    meta = {
+      description = "Easily test your HTTP library against a local copy of httpbin";
+      homepage = https://github.com/kevin1024/pytest-httpbin;
+      license = lib.licenses.mit;
+    };
+  };
+
+  pytest-mock = python.pkgs.buildPythonPackage rec {
+    pname = "pytest-mock";
+    version = "1.10.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "d89a8209d722b8307b5e351496830d5cc5e192336003a485443ae9adeb7dd4c0";
+    };
+    buildInputs = [ setuptools_scm ];
+    propagatedBuildInputs = [ pytest ];
+    checkInputs = [ coverage ];
+    checkPhase = "coverage run --append --source=pytest_mock.py -m pytest test_pytest_mock.py";
+    meta = {
+      description = "Thin-wrapper around the mock package for easier use with py.test";
+      homepage = https://github.com/pytest-dev/pytest-mock/;
+      license = lib.licenses.mit;
+    };
+  };
+
+  pytest-randomly = python.pkgs.buildPythonPackage rec {
+    pname = "pytest-randomly";
+    version = "1.2.3";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "92ec6745d3ebdd690ecb598648748c9601f16f5afacf83ccef2b50d23e6edb7f";
+    };
+    propagatedBuildInputs = [ pytest ];
+    checkInputs = [ factory_boy numpy ];
+    checkPhase = "pytest";
+    meta = {
+      description = "Pytest plugin to randomly order tests and control random.seed.";
+      homepage = https://github.com/adamchainz/pytest-randomly;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  pytest-runner = python.pkgs.buildPythonPackage rec {
+    pname = "pytest-runner";
+    version = "4.2";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "d23f117be39919f00dd91bffeb4f15e031ec797501b717a245e377aee0f577be";
+    };
+    buildInputs = [ setuptools_scm ];
+    propagatedBuildInputs = [ pytest ];
+    patchPhase = "sed -i 's/setuptools_scm>=1.15.0/setuptools_scm/' setup.py";
+    doCheck = false;
+    meta = {
+      description = "Invoke py.test as distutils command with dependency resolution";
+      homepage = https://github.com/pytest-dev/pytest-runner;
+    };
+  };
+
   pytest-sugar = python.pkgs.buildPythonPackage rec {
     pname = "pytest-sugar";
     version = "0.9.1";
@@ -560,6 +1647,61 @@ with rec {
     };
   };
 
+  pytest-timeout = python.pkgs.buildPythonPackage rec {
+    pname = "pytest-timeout";
+    version = "1.3.1";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "4b261bec5782b603c98b4bb803484bc96bf1cdcb5480dae0999d21c7e0423a23";
+    };
+    buildInputs = [ pkgs.glibcLocales ];
+    propagatedBuildInputs = [ pytest ];
+    checkInputs = [ pexpect ];
+    checkPhase = "py.test";
+    LANG = "en_US.UTF-8";
+    meta = {
+      description = "py.test plugin to abort hanging tests";
+      homepage = http://bitbucket.org/pytest-dev/pytest-timeout/;
+      license = lib.licenses.mit;
+    };
+  };
+
+  pytest-xdist = python.pkgs.buildPythonPackage rec {
+    pname = "pytest-xdist";
+    version = "1.22.3";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "48868d1f461122ac8c5fb60487b6da03c0d73dcb06a9d79e06c4eab8ef62a5c3";
+    };
+    buildInputs = [ setuptools_scm ];
+    propagatedBuildInputs = [ execnet pytest-forked ];
+    checkInputs = [ pycmd ];
+    checkPhase = "py.cleanup -aq\npytest";
+    PYTEST_ADDOPTS = "-k 'not test_distribution_rsyncdirs_example and not test_init_rsync_roots and not test_looponfail_removed_test and not test_popen_rsync_subdir and not test_rsync_popen_with_path and not test_rsyncignore'";
+    meta = {
+      description = "pytest xdist plugin for distributed testing and loop-on-failing modes";
+      homepage = https://github.com/pytest-dev/pytest-xdist;
+      license = lib.licenses.mit;
+    };
+  };
+
+  python-dateutil = python.pkgs.buildPythonPackage rec {
+    pname = "python-dateutil";
+    version = "2.7.3";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "e27001de32f627c22380a688bcc43ce83504a7bc5da472209b4c70f02829f0b8";
+    };
+    buildInputs = [ setuptools_scm ];
+    propagatedBuildInputs = [ six ];
+    doCheck = false;
+    meta = {
+      description = "Extensions to the standard Python datetime module";
+      homepage = https://dateutil.readthedocs.io;
+      license = "Dual License";
+    };
+  };
+
   pytoml = python.pkgs.buildPythonPackage rec {
     pname = "pytoml";
     version = "0.1.18";
@@ -567,7 +1709,8 @@ with rec {
       inherit pname version;
       sha256 = "dae3c4e31d09eb06a6076d671f2281ee5d2c43cbeae16599c3af20881bb818ac";
     };
-    doCheck = false;
+    checkInputs = [ pytest ];
+    checkPhase = "pytest";
     meta = {
       description = "A parser for TOML-0.4.0";
       homepage = https://github.com/avakar/pytoml;
@@ -582,7 +1725,7 @@ with rec {
       inherit pname version;
       sha256 = "ffb9ef1de172603304d9d2819af6f5ece76f2e85ec10692a524dd876e72bf277";
     };
-    doCheck = false;
+    checkPhase = "${python.interpreter} -m unittest discover -s pytz/tests";
     meta = {
       description = "World timezone definitions, modern and historical";
       homepage = http://pythonhosted.org/pytz;
@@ -597,11 +1740,29 @@ with rec {
       inherit pname version;
       sha256 = "3ef3092145e9b70e3ddd2c7ad59bdd0252a94dfe3949721633e41344de00a6bf";
     };
-    doCheck = false;
+    buildInputs = [ pkgs.libyaml ];
+    setupPyBuildFlags = [ "--parallel $NIX_BUILD_CORES" ];
     meta = {
       description = "YAML parser and emitter for Python";
       homepage = http://pyyaml.org/wiki/PyYAML;
       license = lib.licenses.mit;
+    };
+  };
+
+  raven = python.pkgs.buildPythonPackage rec {
+    pname = "raven";
+    version = "6.9.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "3fd787d19ebb49919268f06f19310e8112d619ef364f7989246fc8753d469888";
+    };
+    propagatedBuildInputs = [ blinker Flask ];
+    patchPhase = "sed -Ei \"s/[=<>,]+[0-9\.]+'/'/g\" setup.py";
+    doCheck = false;
+    meta = {
+      description = "Raven is a client for Sentry (https://getsentry.com)";
+      homepage = https://github.com/getsentry/raven-python;
+      license = lib.licenses.bsdOriginal;
     };
   };
 
@@ -613,11 +1774,38 @@ with rec {
       sha256 = "ec22d826a36ed72a7358ff3fe56cbd4ba69dd7a6718ffd450ff0e9df7a47ce6a";
     };
     propagatedBuildInputs = [ certifi chardet idna urllib3 ];
-    doCheck = false;
+    checkInputs = [
+      PySocks
+      pytest-cov
+      pytest-httpbin
+      pytest-mock
+      pytest-xdist
+    ];
+    checkPhase = ''
+      PYTEST_ADDOPTS="$PYTEST_ADDOPTS -n$NIX_BUILD_CORES"
+      pytest
+    '';
+    PYTEST_ADDOPTS = "-k 'not test_POSTBIN and not test_conflicting_post_params and not test_connect_timeout and not test_total_timeout_connect'";
     meta = {
       description = "Python HTTP for Humans.";
       homepage = http://python-requests.org;
       license = lib.licenses.asl20;
+    };
+  };
+
+  requirements-detector = python.pkgs.buildPythonPackage rec {
+    pname = "requirements-detector";
+    version = "0.6";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "9fbc4b24e8b7c3663aff32e3eba34596848c6b91bd425079b386973bd8d08931";
+    };
+    propagatedBuildInputs = [ astroid ];
+    doCheck = false;
+    meta = {
+      description = "Python tool to find and list requirements of a Python project";
+      homepage = https://github.com/landscapeio/requirements-detector;
+      license = lib.licenses.mit;
     };
   };
 
@@ -660,24 +1848,18 @@ with rec {
     };
   };
 
-  setuptools = python.pkgs.buildPythonPackage rec {
-    pname = "setuptools";
-    version = "40.0.0";
+  setoptconf = python.pkgs.buildPythonPackage rec {
+    pname = "setoptconf";
+    version = "0.2.0";
     src = python.pkgs.fetchPypi {
       inherit pname version;
-      sha256 = "012adb8e25fbfd64c652e99e7bab58799a3aaf05d39ab38561f69190a909015f";
-      extension = "zip";
+      sha256 = "5b0b5d8e0077713f5d5152d4f63be6f048d9a1bb66be15d089a11c898c3cf49c";
     };
-    installPhase = ''
-      dst=$out/${python.sitePackages}
-      mkdir -p $dst
-      export PYTHONPATH="$dst:$PYTHONPATH"
-      ${python.interpreter} setup.py install --prefix=$out
-    '';
     doCheck = false;
     meta = {
-      description = "Easily download, build, install, upgrade, and uninstall Python packages";
-      homepage = https://github.com/pypa/setuptools;
+      description = "A module for retrieving program settings from various sources in a consistant method.";
+      homepage = https://github.com/jayclassless/setoptconf;
+      license = lib.licenses.mit;
     };
   };
 
@@ -711,6 +1893,63 @@ with rec {
     };
   };
 
+  snowballstemmer = python.pkgs.buildPythonPackage rec {
+    pname = "snowballstemmer";
+    version = "1.2.1";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "919f26a68b2c17a7634da993d91339e288964f93c274f1343e3bbbe2096e1128";
+    };
+    doCheck = false;
+    meta = {
+      description = "This package provides 16 stemmer algorithms (15 + Poerter English stemmer) generated from Snowball algorithms.";
+      homepage = https://github.com/shibukawa/snowball_py;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  Sphinx = python.pkgs.buildPythonPackage rec {
+    pname = "Sphinx";
+    version = "1.7.6";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "217ad9ece2156ed9f8af12b5d2c82a499ddf2c70a33c5f81864a08d8c67b9efc";
+    };
+    propagatedBuildInputs = [
+      alabaster
+      Babel
+      docutils
+      imagesize
+      Jinja2
+      packaging
+      Pygments
+      requests
+      snowballstemmer
+      sphinxcontrib-websupport
+    ];
+    doCheck = false;
+    meta = {
+      description = "Python documentation generator";
+      homepage = http://sphinx-doc.org/;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  sphinxcontrib-websupport = python.pkgs.buildPythonPackage rec {
+    pname = "sphinxcontrib-websupport";
+    version = "1.1.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "9de47f375baf1ea07cdb3436ff39d7a9c76042c10a769c52353ec46e4e8fc3b9";
+    };
+    doCheck = false;
+    meta = {
+      description = "Sphinx API for Web Apps";
+      homepage = http://sphinx-doc.org/;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
   strict-rfc3339 = python.pkgs.buildPythonPackage rec {
     pname = "strict-rfc3339";
     version = "0.7";
@@ -738,6 +1977,22 @@ with rec {
       description = "ANSII Color formatting for output in terminal.";
       homepage = http://pypi.python.org/pypi/termcolor;
       license = lib.licenses.mit;
+    };
+  };
+
+  text-unidecode = python.pkgs.buildPythonPackage rec {
+    pname = "text-unidecode";
+    version = "1.2";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "5a1375bb2ba7968740508ae38d92e1f889a0832913cb1c447d5e2046061a396d";
+    };
+    propagatedBuildInputs = [ pytest ];
+    checkPhase = "pytest";
+    meta = {
+      description = "The most basic Text::Unidecode port";
+      homepage = https://github.com/kmike/text-unidecode/;
+      license = "Artistic License";
     };
   };
 
@@ -779,12 +2034,86 @@ with rec {
     };
     buildInputs = [ setuptools_scm ];
     propagatedBuildInputs = [ packaging pluggy py virtualenv ];
+    checkInputs = [
+      pytest-cov
+      pytest-mock
+      pytest-randomly
+      pytest-timeout
+      pytest-xdist
+    ];
     patchPhase = "rm tests/test_z_cmdline.py";
-    doCheck = false;
+    checkPhase = ''
+      PYTEST_ADDOPTS="$PYTEST_ADDOPTS -n$NIX_BUILD_CORES"
+      pytest
+    '';
+    PYTEST_ADDOPTS = "-k 'not test_env_variables_added_to_pcall and not test_make_sdist'";
     meta = {
       description = "virtualenv-based automation of test activities";
       homepage = https://tox.readthedocs.org/;
       license = "http://opensource.org/licenses/MIT";
+    };
+  };
+
+  traceback2 = python.pkgs.buildPythonPackage rec {
+    pname = "traceback2";
+    version = "1.4.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "05acc67a09980c2ecfedd3423f7ae0104839eccb55fc645773e1caa0951c3030";
+    };
+    buildInputs = [ pbr ];
+    propagatedBuildInputs = [ linecache2 ];
+    doCheck = false;
+    meta = {
+      description = "Backports of the traceback module";
+      homepage = https://github.com/testing-cabal/traceback2;
+    };
+  };
+
+  typed-ast = python.pkgs.buildPythonPackage rec {
+    pname = "typed-ast";
+    version = "1.1.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "57fe287f0cdd9ceaf69e7b71a2e94a24b5d268b35df251a88fef5cc241bf73aa";
+    };
+    doCheck = false;
+    setupPyBuildFlags = [ "--parallel $NIX_BUILD_CORES" ];
+    meta = {
+      description = "a fork of Python 2 and 3 ast modules with type comment support";
+      homepage = https://github.com/python/typed_ast;
+      license = lib.licenses.asl20;
+    };
+  };
+
+  UkPostcodeParser = python.pkgs.buildPythonPackage rec {
+    pname = "UkPostcodeParser";
+    version = "1.1.2";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "930264efa293db80af0103a4fe9c161b06365598d24bb6fe5403f3f57c70530e";
+    };
+    doCheck = false;
+    meta = {
+      description = "UK Postcode parser";
+      homepage = https://github.com/hamstah/ukpostcodeparser;
+      license = lib.licenses.mit;
+    };
+  };
+
+  unittest2 = python.pkgs.buildPythonPackage rec {
+    pname = "unittest2";
+    version = "1.1.0";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "22882a0e418c284e1f718a822b3b022944d53d2d908e1690b319a9d3eb2c0579";
+    };
+    propagatedBuildInputs = [ six traceback2 ];
+    doCheck = false;
+    postPatch = python.pkgs.unittest2.postPatch;
+    meta = {
+      description = "The new features in unittest backported to Python 2.4+.";
+      homepage = http://pypi.python.org/pypi/unittest2;
     };
   };
 
@@ -832,6 +2161,22 @@ with rec {
     };
   };
 
+  vulture = python.pkgs.buildPythonPackage rec {
+    pname = "vulture";
+    version = "0.24";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "23d837cf619c3bb75f87bc498c79cd4f27f0c54031ca88a9e05606c9dd627fef";
+    };
+    checkInputs = [ pytest-cov ];
+    checkPhase = "py.test";
+    meta = {
+      description = "Find dead code";
+      homepage = https://github.com/jendrikseipp/vulture;
+      license = lib.licenses.mit;
+    };
+  };
+
   wcwidth = python.pkgs.buildPythonPackage rec {
     pname = "wcwidth";
     version = "0.1.7";
@@ -839,11 +2184,25 @@ with rec {
       inherit pname version;
       sha256 = "3df37372226d6e63e1b1e1eda15c594bca98a22d33a23832a90998faa96bc65e";
     };
-    doCheck = false;
     meta = {
       description = "Measures number of Terminal column cells of wide-character codes";
       homepage = https://github.com/jquast/wcwidth;
       license = lib.licenses.mit;
+    };
+  };
+
+  Werkzeug = python.pkgs.buildPythonPackage rec {
+    pname = "Werkzeug";
+    version = "0.14.1";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "c3fd7a7d41976d9f44db327260e263132466836cef6f91512889ed60ad26557c";
+    };
+    doCheck = false;
+    meta = {
+      description = "The comprehensive WSGI web application library.";
+      homepage = https://www.palletsprojects.org/p/werkzeug/;
+      license = lib.licenses.bsdOriginal;
     };
   };
 
@@ -854,10 +2213,25 @@ with rec {
       inherit pname version;
       sha256 = "d806f65ac1554366b6e31d29d7be2e8893996c0acbb2824bbf2b1f49cf628a13";
     };
-    doCheck = false;
     meta = {
       description = "A tool to programmatically control windows inside X";
       homepage = http://bitbucket.org/antocuni/wmctrl;
+      license = lib.licenses.bsdOriginal;
+    };
+  };
+
+  wrapt = python.pkgs.buildPythonPackage rec {
+    pname = "wrapt";
+    version = "1.10.11";
+    src = python.pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "d4d560d479f2c21e1b5443bbd15fe7ec4b37fe7e53d335d3b9b0a7b1226fe3c6";
+    };
+    doCheck = false;
+    setupPyBuildFlags = [ "--parallel $NIX_BUILD_CORES" ];
+    meta = {
+      description = "Module for decorators, wrappers and monkey patching.";
+      homepage = https://github.com/GrahamDumpleton/wrapt;
       license = lib.licenses.bsdOriginal;
     };
   };
@@ -892,17 +2266,17 @@ python.pkgs.buildPythonPackage rec {
     pdbpp
     pipreqs
     property-manager
+    prospector
     ptpython
     pycmd
-    pytest-cov
     pytest-sugar
     pytoml
-    PyYAML
     requirementslib
     tox
   ];
-  LANG = "en_US.UTF-8";
+  checkInputs = [ pytest-cov ];
   checkPhase = "pytest && cp coverage.xml $out";
+  LANG = "en_US.UTF-8";
   meta = {
     description = "Extract metadata, including full dependencies, from source distributions";
     homepage = https://github.com/0compute/distinfo;

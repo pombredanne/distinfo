@@ -1,6 +1,7 @@
 import logging
 
 from packaging.requirements import InvalidRequirement, Requirement as _Requirement
+from packaging.utils import canonicalize_name
 
 import pkg_resources
 
@@ -14,6 +15,7 @@ class Requirement(Base, _Requirement):
     def __init__(self, requirement_string):
         super().__init__(requirement_string)
         self.requirement_string = requirement_string
+        self.cname = canonicalize_name(self.name)
 
     def __hash__(self):
         # hack: makes it easy to check if a set contains the requirement

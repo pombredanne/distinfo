@@ -115,7 +115,11 @@ class Distribution(Base):
         for extra in self.provides_extra:
             ereqs = self._filter_reqs(reqs, extra)
             if ereqs:
-                requires[extra] = ereqs
+                # drop marker as no longer required
+                requires[extra] = set(map(
+                    lambda r: setattr(r, "marker", None) or r,
+                    ereqs,
+                ))
         return requires
 
     def add_requirement(self, req, extra="run"):

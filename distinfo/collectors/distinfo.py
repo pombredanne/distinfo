@@ -39,10 +39,11 @@ class DistInfo(Collector):
         try:
             # FIXME: don't work
             # setuptools.sandbox.run_setup(const.SETUP_PY, ["-h"])
-            setuptools.sandbox._execfile(
-                const.SETUP_PY,
-                dict(__file__=const.SETUP_PY, __name__="__main__"),
-            )
+            with setuptools.sandbox.save_argv((const.SETUP_PY, "-h")):
+                setuptools.sandbox._execfile(
+                    const.SETUP_PY,
+                    dict(__file__=const.SETUP_PY, __name__="__main__"),
+                )
         finally:
             setuptools.setup = _setup
 

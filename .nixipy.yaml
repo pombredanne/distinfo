@@ -1,0 +1,5 @@
+packages:
+  distinfo:
+    buildInputs: pkgs.glibcLocales
+    LANG: en_US.UTF-8
+    checkPhase: pytest && cp coverage.xml $out

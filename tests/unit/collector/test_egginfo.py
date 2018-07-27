@@ -28,4 +28,4 @@ class TestEggInfo(Case):
 
     def test_collect_empty(self, caplog, tmpdir):  # pylint: disable=arguments-differ
         super().test_collect_empty(tmpdir)
-        assert "has no egg info" in caplog.text
+        assert "has no PKG-INFO" in caplog.text

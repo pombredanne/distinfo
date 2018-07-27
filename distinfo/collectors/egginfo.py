@@ -31,15 +31,15 @@ class EggInfo(Collector):
 
     def _collect(self):
 
-        egg_infos = list(self.path.glob("**/*.egg-info"))
-        if not egg_infos:
-            log.warning("%r has no egg info", self)
+        pkg_infos = list(self.path.glob("**/PKG-INFO"))
+        if not pkg_infos:
+            log.warning("%r has no PKG-INFO", self)
             return
-        egg_info = egg_infos[0]
+        pkg_info = pkg_infos[0]
 
         # parse metadata
         parser = FeedParser()
-        parser.feed(open(egg_info / "PKG-INFO").read())
+        parser.feed(pkg_info.open().read())
         message = parser.close()
         for key, value in message.items():
             value = value.strip()
@@ -53,7 +53,7 @@ class EggInfo(Collector):
                 self.metadata[key] = value
 
         # parse requires
-        requires_path = egg_info / "requires.txt"
+        requires_path = pkg_info.parent / "requires.txt"
         if requires_path.exists():
             requires = requires_path.open().read()
             for extra, reqs in sorted(pkg_resources.split_sections(requires),

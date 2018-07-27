@@ -2,6 +2,7 @@ import importlib
 import logging
 import os
 import sys
+import textwrap
 
 from munch import DefaultMunch, Munch
 
@@ -53,7 +54,7 @@ class Distribution(Base):
             log.debug(
                 "%r requires:\n%s",
                 self,
-                util.dumps(self.requires, fmt="yamls"),
+                textwrap.indent(util.dumps(self.requires, fmt="yamls"), "  "),
             )
 
     def __str__(self):

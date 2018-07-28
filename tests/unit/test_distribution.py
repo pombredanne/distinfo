@@ -46,24 +46,15 @@ class TestDistribution(Case):
         dist.add_requirement("setuptools")
         assert not dist.requires
 
+    def test_add_requirement_non_named(self, caplog):
+        dist = Distribution()
+        dist.add_requirement(".")
+        assert not dist.requires
+        assert "ignoring non-named" in caplog.text
+
     def test_add_requirement_invalid(self, caplog):
         dist = Distribution()
         dist.add_requirement("-cxxx")
-        assert "RequirementParseError" in caplog.text
-
-    def test_requires(self, caplog):
-        dist = Distribution(
-            requires_dist=[
-                "xxx",
-                "asdasd; d",
-                "yyy; extra == 'aaa' and python_version < '1'",
-                "-cxxx",
-            ],
-            provides_extra=["yyy"],
-        )
-        assert {"xxx"} == dist.requires.run
-        assert not dist.requires.yyy
-        assert "InvalidMarker" in caplog.text
         assert "RequirementParseError" in caplog.text
 
     def test_init_dummy_collect(self, monkeypatch, tmpdir):

@@ -21,6 +21,12 @@ class DistInfo(Collector):
         tests_require="test",
     )
 
+    def _filter_reqs(self, reqs):
+        # fix incorrectly specified requirements (unittest2 does this)
+        if isinstance(reqs, tuple) and isinstance(reqs[0], list):
+            reqs = reqs[0]
+        return filter(lambda r: r.strip(), reqs)
+
     def _collect(self):
 
         setup_py = self.path / const.SETUP_PY
@@ -56,13 +62,10 @@ class DistInfo(Collector):
         # get requirements from distutils dist
         for attr, extra in self.STD_EXTRAS.items():
             reqs = getattr(dist, attr, None) or []
-            # fix incorrectly specified requirements (unittest2 does this)
-            if isinstance(reqs, tuple) and isinstance(reqs[0], list):
-                reqs = reqs[0]
-            for req in reqs:
+            for req in self._filter_reqs(reqs):
                 self.add_requirement(req, extra)
         for extra, reqs in getattr(dist, "extras_require", {}).items():
-            for req in reqs:
+            for req in self._filter_reqs(reqs):
                 self.add_requirement(req, extra)
 
         # get packages

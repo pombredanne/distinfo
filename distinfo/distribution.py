@@ -4,7 +4,7 @@ import textwrap
 
 from munch import DefaultMunch, Munch
 
-from packaging.markers import InvalidMarker, Marker
+from packaging.markers import Marker
 
 import pkg_resources
 
@@ -81,28 +81,17 @@ class Distribution(Base):
         filtered = set()
         env = dict(extra=extra)
         for req in reqs:
-            try:
-                if extra == "run":
-                    if req.markers is None or Marker(req.markers).evaluate(env):
-                        filtered.add(req)
-                else:
-                    if req.markers is not None and Marker(req.markers).evaluate(env):
-                        filtered.add(req)
-            except InvalidMarker as exc:
-                log.warning("%r %r raised %r", self, req, exc)
+            if extra == "run":
+                if req.markers is None or Marker(req.markers).evaluate(env):
+                    filtered.add(req)
+            else:
+                if req.markers is not None and Marker(req.markers).evaluate(env):
+                    filtered.add(req)
         return filtered
 
     @cached_property
     def requires(self):
-        reqs = set()
-        for req in self.requires_dist:
-            try:
-                req = Requirement.from_line(req)
-            except pkg_resources.RequirementParseError as exc:
-                log.warning("%r requirement %r raised: %r", self, req, exc)
-                self.requires_dist.remove(req)
-            else:
-                reqs.add(req)
+        reqs = set(map(Requirement.from_line, self.requires_dist))
         requires = DefaultMunch(set())
         run = self._filter_reqs(reqs, "run")
         if run:
@@ -128,14 +117,19 @@ class Distribution(Base):
                 log.warning("%r %r add %r raised %r", self, extra, req, exc)
                 return
 
-        # skip out for implicit requirements
-        if req in self.IMPLICIT_PACKAGES:
+        if not req.is_named:
+            log.warning("%r ignoring non-named %r", self, req)
             return
 
-        # skip out if requirement is already present
-        if req in self.requires[extra] \
-                or (extra != "run" and req in self.requires["run"]):
+        # skip out for implicit requirements
+        if req.name in self.IMPLICIT_PACKAGES:
             return
+
+        # check existing requirement
+        for ereq in self.requires[extra] \
+                | (extra != "run" and self.requires["run"] or set()):
+            if ereq.normalized_name == req.normalized_name:
+                return
 
         if extra != "run":
             if ":" in extra:  # setuptools extra:condition syntax

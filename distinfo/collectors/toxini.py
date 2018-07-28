@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import sys
 
 from munch import Munch
@@ -14,6 +15,8 @@ log = logging.getLogger(__name__)
 
 class ToxIni(Collector):
 
+    ENV_NAME_PATTERN = re.compile("^py[0-9]+")
+
     def _collect(self):
 
         if not (self.path / "tox.ini").exists():
@@ -27,7 +30,7 @@ class ToxIni(Collector):
 
         name = "py%d%d" % (sys.version_info.major, sys.version_info.minor)
         configs = sorted([c for c in toxconf.envconfigs.values()
-                          if c.envname.startswith("py")],
+                          if self.ENV_NAME_PATTERN.match(c.envname)],
                          key=lambda c: c.envname)
         for config in configs:
             if config.envname.startswith(name):
@@ -35,10 +38,12 @@ class ToxIni(Collector):
         else:
             if not configs:
                 return
-            config = configs[0]
+            # take the last environment which will be the highest python
+            config = configs[-1]
             log.warning(
-                "%r has no standard environment, taking %r",
+                "%r has no environment for %r, falling back to %r",
                 self,
+                name,
                 config.envname,
             )
 

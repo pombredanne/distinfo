@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="distinfo",
-    version="0.3.0.dev",
+    use_scm_version=True,
     author="Arthur Noel",
     author_email="arthur@0compute.net",
     url="https://github.com/0compute/distinfo",
@@ -33,7 +33,8 @@ setup(
         ),
     ),
     setup_requires=(
-        # "pytest-runner",
+        "pytest-runner",
+        "setuptools_scm",
     ),
     install_requires=(
         "appdirs",

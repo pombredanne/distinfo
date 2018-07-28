@@ -1870,6 +1870,7 @@ with rec {
       inherit pname version;
       sha256 = "113cea38b2edba8538b7e608b58cbd7e09bb71b16d968a9b97e36b4805e06d59";
     };
+    propagatedBuildInputs = [ pkgs.gitMinimal ];
     doCheck = false;
     meta = {
       description = "the blessed package to manage your versions by scm tags";
@@ -2255,9 +2256,9 @@ with rec {
 };
 python.pkgs.buildPythonPackage rec {
   pname = "distinfo";
-  version = "0.3.0.dev0";
+  version = "0.2.1.dev39+g3210ec3.d20180728";
   src = nix-gitignore.gitignoreSource ./.;
-  buildInputs = [ pkgs.glibcLocales ];
+  buildInputs = [ pkgs.glibcLocales pytest-runner setuptools_scm ];
   propagatedBuildInputs = [
     appdirs
     click

@@ -30,7 +30,7 @@ class TestDistribution(Case):
     def test_add_requirement(self):
         dist = Distribution()
         dist.add_requirement("xxx")
-        dist.add_requirement(Requirement("xxx"))
+        dist.add_requirement(Requirement.from_line("xxx"))
         assert {"xxx"} == dist.requires.run
         dist.add_requirement("xxx", extra="test")
         assert {"xxx"} == dist.requires.run
@@ -53,7 +53,7 @@ class TestDistribution(Case):
     def test_add_requirement_invalid(self, caplog):
         dist = Distribution()
         dist.add_requirement("-cxxx")
-        assert "InvalidRequirement" in caplog.text
+        assert "RequirementParseError" in caplog.text
 
     def test_requires(self, caplog):
         dist = Distribution(
@@ -61,16 +61,18 @@ class TestDistribution(Case):
                 "xxx",
                 "asdasd; d",
                 "yyy; extra == 'aaa' and python_version < '1'",
+                "-cxxx",
             ],
             provides_extra=["yyy"],
         )
         assert {"xxx"} == dist.requires.run
         assert not dist.requires.yyy
-        assert "InvalidRequirement" in caplog.text
+        assert "InvalidMarker" in caplog.text
+        assert "RequirementParseError" in caplog.text
 
     def test_init_dummy_collect(self, monkeypatch, tmpdir):
         monkeypatch.setitem(config.cfg, "collectors", ["DummyCollector"])
         monkeypatch.setattr(importlib, "import_module", lambda _x: DummyModule())
         self._write_setup(tmpdir)
-        dist = Distribution(tmpdir)
+        dist = Distribution(req=Requirement.from_line(str(tmpdir)))
         assert dist.name == "xxx"

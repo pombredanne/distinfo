@@ -56,7 +56,7 @@ def main(source_dir, **options):
         cfg.logging.config.isatty = True
     configure_logging()
 
-    dist = Distribution(source_dir)
+    dist = Distribution(req=Requirement.from_line(source_dir))
 
     if options.interactive:
         namespace = dict(

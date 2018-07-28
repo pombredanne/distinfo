@@ -1,9 +1,8 @@
 import logging
 
-from packaging.requirements import InvalidRequirement, Requirement as _Requirement
-from packaging.utils import canonicalize_name
-
 import pkg_resources
+
+from requirementslib import Requirement as _Requirement
 
 from .base import Base
 
@@ -12,34 +11,28 @@ log = logging.getLogger(__name__)
 
 class Requirement(Base, _Requirement):
 
-    def __init__(self, requirement_string):
-        super().__init__(requirement_string)
-        self.requirement_string = requirement_string
-        self.cname = canonicalize_name(self.name)
-
-    def __hash__(self):
-        # hack: makes it easy to check if a set contains the requirement
-        return hash(self.name.lower())
-
     def __eq__(self, other):
         if isinstance(other, str):
-            other = type(self)(other)
+            other = type(self).from_line(other)
         elif not isinstance(other, type(self)):
             return False
-        if self.name.lower() == other.name.lower():
-            if self.specifier == other.specifier:
+        if self.normalized_name == other.normalized_name:
+            if self.specifiers == other.specifiers:
                 return True
-            if not self.specifier or not other.specifier:
+            if not self.specifiers or not other.specifiers:
                 return True
         return False
 
-    def __dump__(self):
-        return str(self).split(";")[0]
+    def __hash__(self):
+        return hash(self.normalized_name)
+
+    def __str__(self):
+        return self.as_line()
 
     @classmethod
-    def parse_file(cls, path):
+    def from_file(cls, path):
         for line in pkg_resources.yield_lines(open(path)):
             try:
-                yield cls(line)
-            except InvalidRequirement as exc:
+                yield cls.from_line(line)
+            except pkg_resources.RequirementParseError as exc:
                 log.warning("line %r of %r raised %r", line, path, exc)

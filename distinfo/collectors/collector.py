@@ -43,7 +43,7 @@ class Collector(Base):
             log.warning("%r already seen %r", self, path)
             return
         self._seen_files.add(path)
-        for req in Requirement.parse_file(path):
+        for req in Requirement.from_file(path):
             self.add_requirement(req, extra)
 
     def _get_setup_cfg(self):

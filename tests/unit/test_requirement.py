@@ -5,26 +5,23 @@ from .cases import Case
 REQUIREMENTS = """
 aaa
 http://h/p
+-cxxx
 """
 
 
 class TestRequirement(Case):
 
-    def test_repr(self):
-        req = Requirement("xxx")
-        assert repr(req) == "<Requirement xxx>"
-
     def test_eq(self):
-        assert Requirement("xxx") == Requirement("xxx")
-        assert Requirement("Xxx") == "xxx"
-        assert Requirement("xxx") != "yyy"
-        assert Requirement("xxx") != 1
-        assert Requirement("xxx>1") == Requirement("xxx>1")
-        assert Requirement("xxx>1") != Requirement("xxx>2")
-        assert Requirement("xxx>1") == Requirement("xxx")
+        assert Requirement.from_line("xxx") == Requirement.from_line("xxx")
+        assert Requirement.from_line("Xxx") == "xxx"
+        assert Requirement.from_line("xxx") != "yyy"
+        assert Requirement.from_line("xxx") != 1
+        assert Requirement.from_line("xxx>1") == Requirement.from_line("xxx>1")
+        assert Requirement.from_line("xxx>1") != Requirement.from_line("xxx>2")
+        assert Requirement.from_line("xxx>1") == Requirement.from_line("xxx")
 
-    def test_parse_file(self, tmpdir):
+    def test_from_file(self, tmpdir):
         requirements = "requirements.txt"
         reqs = tmpdir.join(requirements)
         reqs.write(REQUIREMENTS)
-        assert list(Requirement.parse_file(reqs))[0] == "aaa"
+        assert list(Requirement.from_file(reqs)) == ["aaa", "http://h/p"]

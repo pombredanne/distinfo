@@ -1,13 +1,10 @@
 import importlib
 import logging
-import os
-import sys
 import textwrap
 
 from munch import DefaultMunch, Munch
 
-from packaging.markers import Marker
-from packaging.requirements import InvalidRequirement
+from packaging.markers import InvalidMarker, Marker
 
 import pkg_resources
 
@@ -27,8 +24,8 @@ class Distribution(Base):
 
     IMPLICIT_PACKAGES = ("setuptools", "wheel")
 
-    def __init__(self, path=None, **kwargs):
-        self.path = path
+    def __init__(self, req=None, **kwargs):
+        self.req = req
         self.metadata = Munch(
             name="UNKNOWN",
             version="0.0.0",
@@ -37,10 +34,8 @@ class Distribution(Base):
             extensions=Munch(distinfo=DefaultMunch(None)),
         )
         self.metadata.update(kwargs)
-        if self.path is not None:
-            self.path = os.path.relpath(self.path)
-            with sandbox.pushd(self.path), sandbox.save_path():
-                sys.path.insert(0, ".")
+        if self.req is not None and self.req.is_file_or_url:
+            with sandbox.pushd(self.req.req.path):
                 for name in cfg.collectors:
                     module = importlib.import_module(
                         "distinfo.collectors.%s" % name.lower()
@@ -86,12 +81,15 @@ class Distribution(Base):
         filtered = set()
         env = dict(extra=extra)
         for req in reqs:
-            if extra == "run":
-                if req.marker is None or req.marker.evaluate(env):
-                    filtered.add(req)
-            else:
-                if req.marker is not None and req.marker.evaluate(env):
-                    filtered.add(req)
+            try:
+                if extra == "run":
+                    if req.markers is None or Marker(req.markers).evaluate(env):
+                        filtered.add(req)
+                else:
+                    if req.markers is not None and Marker(req.markers).evaluate(env):
+                        filtered.add(req)
+            except InvalidMarker as exc:
+                log.warning("%r %r raised %r", self, req, exc)
         return filtered
 
     @cached_property
@@ -99,8 +97,8 @@ class Distribution(Base):
         reqs = set()
         for req in self.requires_dist:
             try:
-                req = Requirement(req)
-            except InvalidRequirement as exc:
+                req = Requirement.from_line(req)
+            except pkg_resources.RequirementParseError as exc:
                 log.warning("%r requirement %r raised: %r", self, req, exc)
                 self.requires_dist.remove(req)
             else:
@@ -115,7 +113,7 @@ class Distribution(Base):
             if ereqs:
                 # drop marker as no longer required
                 requires[extra] = set(map(
-                    lambda r: setattr(r, "marker", None) or r,
+                    lambda r: setattr(r, "markers", None) or r,
                     ereqs,
                 ))
         return requires
@@ -125,8 +123,8 @@ class Distribution(Base):
         # cast to Requirement
         if not isinstance(req, Requirement):
             try:
-                req = Requirement(req)
-            except InvalidRequirement as exc:
+                req = Requirement.from_line(req)
+            except (pkg_resources.RequirementParseError, ValueError) as exc:
                 log.warning("%r %r add %r raised %r", self, extra, req, exc)
                 return
 
@@ -147,8 +145,8 @@ class Distribution(Base):
             if extra:
                 extra = pkg_resources.safe_extra(extra)
                 self.provides_extra.add(extra)
-                req.marker = Marker("extra == '%s'" % extra)
+                req.markers = req.req.markers = "extra == '%s'" % extra
 
-        self.requires_dist.add(str(req))
+        self.requires_dist.add(req.as_line())
         del self.requires
         return req

@@ -23,7 +23,7 @@ class TestPipFile(Case):
     def test_collect(self, tmpdir):
         tmpdir.join("Pipfile").write(PIPFILE)
         collector = self._collect(tmpdir)
-        assert {"yyy"} == collector.requires.dev
+        assert {"yyy>=1"} == collector.requires.dev
         assert {"zzz"} == collector.requires.run
 
     def test_bad_collect(self, caplog, tmpdir):

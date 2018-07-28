@@ -3,7 +3,7 @@ import logging
 import sys
 import warnings
 
-import setuptools
+from setuptools import sandbox
 
 from .. import const
 from .collector import Collector
@@ -37,24 +37,12 @@ class DistInfo(Collector):
         distutils.core._setup_distribution = None
         distutils.core._setup_stop_after = "config"
 
-        # replace setuptools.setup with distutils.setup because the setuptools
-        # version attempts to install `setup_requires` which is not necessary
-        # for our purposes
-        _setup = setuptools.setup
-        setuptools.setup = distutils.core.setup
-
-        try:
-            # FIXME: don't work
-            # setuptools.sandbox.run_setup(const.SETUP_PY, ["-h"])
-            sandbox = setuptools.sandbox
-            with sandbox.save_argv((const.SETUP_PY, "-h")), sandbox.save_path():
-                sys.path.insert(0, ".")
-                sandbox._execfile(
-                    const.SETUP_PY,
-                    dict(__file__=const.SETUP_PY, __name__="__main__"),
-                )
-        finally:
-            setuptools.setup = _setup
+        with sandbox.save_argv((const.SETUP_PY, "-h")), sandbox.save_path():
+            sys.path.insert(0, ".")
+            sandbox._execfile(
+                const.SETUP_PY,
+                dict(__file__=const.SETUP_PY, __name__="__main__"),
+            )
 
         dist = distutils.core._setup_distribution
         assert dist is not None, "distutils.core.setup not called"

@@ -41,14 +41,6 @@ class Distribution(Base):
                         "distinfo.collectors.%s" % name.lower()
                     )
                     getattr(module, name)(self).collect()
-        # a side effect of the below is that `requires` will remove any invalid
-        # requirements
-        if self.requires:
-            log.debug(
-                "%r requires:\n%s",
-                self,
-                textwrap.indent(util.dumps(self.requires, fmt="yamls"), "  "),
-            )
 
     def __str__(self):
         return "%s-%s" % (self.name, self.version)

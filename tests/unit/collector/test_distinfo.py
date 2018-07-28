@@ -8,9 +8,9 @@ from setuptools import setup, find_packages
 setup(
     packages=find_packages(),
     py_modules=["yyy"],
-    # setup_requires packages must be present or distutils will barf, so we
-    # use one that definitely is here
-    setup_requires=["zzz"],
+    # setuptools will attempt to fetch setup_requires packages if not present
+    # so we use one from our own requirements that is already here
+    setup_requires=["appdirs"],
     install_requires=["bbb"],
     # badly specified requirements, seen in unittest2
     tests_require=(["ccc"],),
@@ -29,7 +29,7 @@ class TestDistInfo(Case):
         self._write_setup(tmpdir, SETUP)
         tmpdir.join("xxx").mkdir().join("__init__.py").write("")
         collector = self._collect(tmpdir)
-        assert {"zzz"} == collector.requires.build
+        assert {"appdirs"} == collector.requires.build
         assert {"bbb"} == collector.requires.run
         assert {"ccc", "ddd"} == collector.requires.test
         assert ["xxx"] == collector.ext.packages

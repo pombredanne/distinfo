@@ -13,7 +13,6 @@ from requirementslib.utils import pep423_name
 
 from setuptools import sandbox
 
-from . import util
 from .base import Base
 from .config import cfg
 from .requirement import Requirement

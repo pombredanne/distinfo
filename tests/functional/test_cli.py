@@ -1,8 +1,13 @@
 import json
+from pathlib import Path
 
 import appdirs
 
 from click.testing import CliRunner
+
+import pytest
+
+from setuptools import sandbox
 
 from distinfo import cli
 
@@ -28,7 +33,7 @@ class TestCli(Case):
         assert result.exit_code == exit_code
         return result
 
-    def test_main_extract(self, tmpdir):
+    def test_extract(self, tmpdir):
         result = self._invoke(tmpdir, "-c")
         print(result.output)
         # FIXME: logging writes to stdout
@@ -36,33 +41,48 @@ class TestCli(Case):
         # assert dist["name"] == "test.dist"
         assert "test.dist" in result.output
 
-    def test_main_extract_write(self, tmpdir):
+    def test_extract_write(self, tmpdir):
         out = tmpdir.join("out.json")
         self._invoke(tmpdir, "-p", "-o", out)
         dist = json.load(open(out))
         assert dist["name"] == "test.dist"
 
-    def test_main_extract_write_include_exclude(self, tmpdir):
+    def test_extract_write_include_exclude(self, tmpdir):
         out = tmpdir.join("out.json")
         self._invoke(tmpdir, "-o", out, "--include=name", "--exclude=name")
         dist = json.load(open(out))
         assert not dist
 
-    def test_main_requires(self, tmpdir):
+    def test_requires(self, tmpdir):
         result = self._invoke(tmpdir, "-r")
         print(result.output)
         # dist = json.loads(result.output)
         # assert dist["name"] == "test.dist"
         assert "xxx" in result.output
 
-    def test_main_extra(self, tmpdir):
+    def test_extra(self, tmpdir):
         result = self._invoke(tmpdir, "--extra=xxx:yyy")
         print(result.output)
         # dist = json.loads(result.output)
         # assert dist["name"] == "test.dist"
         assert "yyy; extra == 'xxx'" in result.output
 
-    def test_main_interactive(self, monkeypatch, tmpdir):
+    def test_interactive(self, monkeypatch, tmpdir):
         monkeypatch.setattr(cli.repl, "embed", lambda *a, **k: True)
         monkeypatch.setattr(appdirs, "user_cache_dir", lambda *a: tmpdir.mkdir("cache"))
         self._invoke(tmpdir.mkdir("src"), "-i")
+
+    def test_as_module(self, tmpdir, capsys):
+        self._run_egg_info(tmpdir, SETUP)
+        main = str(Path(cli.__file__).parent / "__main__.py")
+        with sandbox.save_argv((main, str(tmpdir))):
+            pytest.raises(
+                SystemExit,
+                sandbox._execfile,
+                main,
+                dict(__file__=main, __name__="__main__"),
+            )
+        captured = capsys.readouterr()
+        # dist = json.loads(captured.out)
+        # assert dist["name"] == "test.dist"
+        assert "test.dist" in captured.out

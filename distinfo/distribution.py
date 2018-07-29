@@ -115,7 +115,7 @@ class Distribution(Base):
                 return
 
         if not req.is_named:
-            log.warning("%r ignoring non-named %r", self, req)
+            log.warning("%r ignoring unnamed %r", self, req)
             return
 
         # skip out for implicit requirements

@@ -16,3 +16,7 @@ class TestRequirement(Case):
         reqs = tmpdir.join(requirements)
         reqs.write(REQUIREMENTS)
         assert list(Requirement.from_file(reqs)) == ["aaa", "http://h/p"]
+
+    def test_is_named(self):
+        req = Requirement(name=None)
+        assert not req.is_named

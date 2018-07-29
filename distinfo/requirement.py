@@ -21,3 +21,9 @@ class Requirement(Base, _Requirement):
                 yield cls.from_line(line)
             except pkg_resources.RequirementParseError as exc:
                 log.warning("line %r of %r raised %r", line, path, exc)
+
+    @property
+    def is_named(self):
+        if self.name is None:
+            return False
+        return super().is_named

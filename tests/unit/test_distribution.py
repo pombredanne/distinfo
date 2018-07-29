@@ -50,11 +50,12 @@ class TestDistribution(Case):
         dist.add_requirement("setuptools")
         assert not dist.requires
 
-    def test_add_requirement_non_named(self, caplog):
+    def test_add_requirement_unnamed(self, caplog):
         dist = Distribution()
         dist.add_requirement(".")
+        dist.add_requirement("-e .")
         assert not dist.requires
-        assert "ignoring non-named" in caplog.text
+        assert "ignoring unnamed" in caplog.text
 
     def test_add_requirement_invalid(self, caplog):
         dist = Distribution()

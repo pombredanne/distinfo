@@ -55,6 +55,13 @@ class TestCli(Case):
         # assert dist["name"] == "test.dist"
         assert "xxx" in result.output
 
+    def test_main_extra(self, tmpdir):
+        result = self._invoke(tmpdir, "--extra=xxx:yyy")
+        print(result.output)
+        # dist = json.loads(result.output)
+        # assert dist["name"] == "test.dist"
+        assert "yyy; extra == 'xxx'" in result.output
+
     def test_main_interactive(self, monkeypatch, tmpdir):
         monkeypatch.setattr(cli.repl, "embed", lambda *a, **k: True)
         monkeypatch.setattr(appdirs, "user_cache_dir", lambda *a: tmpdir.mkdir("cache"))

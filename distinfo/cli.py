@@ -38,6 +38,12 @@ log = logging.getLogger(__name__)
     default=util.DEFAULT_DUMPER,
     help="Output format",
 )
+@click.option(
+    "-e",
+    "--extra",
+    multiple=True,
+    help="Add extra requirements formatted as 'extra:requirement'",
+)
 @click.option("-c", "--color", is_flag=True, help="Force colored output")
 @click.option("-p", "--pretty", is_flag=True, help="Pretty print output")
 @click.option("-o", "--output", help="Output to file")
@@ -57,6 +63,9 @@ def main(source_dir, **options):
     configure_logging()
 
     dist = Distribution(req=Requirement.from_line(source_dir))
+    for extra in options.extra:
+        extra, req = extra.split(":")
+        dist.add_requirement(req, extra=extra)
 
     if options.interactive:
         namespace = dict(

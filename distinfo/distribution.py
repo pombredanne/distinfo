@@ -137,6 +137,6 @@ class Distribution(Base):
                 self.provides_extra.add(extra)
                 req.markers = req.req.markers = "extra == '%s'" % extra
 
-        self.requires_dist.add(req.as_line())
+        self.requires_dist.add(str(req))
         del self.requires
         return req

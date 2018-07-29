@@ -1,6 +1,5 @@
 import importlib
 import logging
-import textwrap
 
 from munch import DefaultMunch, Munch
 
@@ -9,6 +8,8 @@ from packaging.markers import Marker
 import pkg_resources
 
 from property_manager import cached_property
+
+from requirementslib.utils import pep423_name
 
 from setuptools import sandbox
 
@@ -52,6 +53,10 @@ class Distribution(Base):
     @name.setter
     def name(self, name):
         self.metadata.name = name
+
+    @property
+    def normalized_name(self):
+        return pep423_name(self.name)
 
     @property
     def version(self):

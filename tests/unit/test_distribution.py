@@ -23,6 +23,10 @@ class DummyModule:
 
 class TestDistribution(Case):
 
+    def test_normalized_name(self):
+        dist = Distribution()
+        assert dist.normalized_name == "unknown"
+
     def test_add_requirement(self):
         dist = Distribution()
         dist.add_requirement("xxx")

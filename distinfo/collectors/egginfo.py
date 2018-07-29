@@ -12,21 +12,17 @@ class EggInfo(Collector):
 
     MULTI_KEYS = (
         "classifier",
+        "obsoletes",
         "obsoletes_dist",
         "platform",
         "project_url",
+        "provides",
         "provides_dist",
         "provides_extra",
+        "requires",
         "requires_dist",
         "requires_external",
         "supported_platform",
-    )
-
-    # these are from PEP 314 Metadata 1.1
-    KEY_ALIASES = dict(
-        obsoletes="obsoletes_dist",
-        provides="provides_dist",
-        requires="requires_dist",
     )
 
     def _collect(self):
@@ -46,7 +42,6 @@ class EggInfo(Collector):
             if not value or value == "UNKNOWN":
                 continue
             key = key.lower().replace("-", "_")
-            key = self.KEY_ALIASES.get(key, key)
             if key in self.MULTI_KEYS:
                 self.metadata.setdefault(key, set()).add(value)
             else:

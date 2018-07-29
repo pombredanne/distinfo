@@ -7,6 +7,10 @@ from distinfo.collectors.collector import Collector, PackageCollector
 
 from ..cases import Case
 
+REQUIREMENTS = """
+aaa
+bbb == 1
+"""
 
 class XCollector(PackageCollector):  # pylint: disable=abstract-method
 
@@ -17,13 +21,13 @@ class TestCollector(Case):
 
     def test_add_requirements_file(self, tmpdir):
         requirements = "requirements.txt"
-        tmpdir.join(requirements).write("aaa")
+        tmpdir.join(requirements).write(REQUIREMENTS)
         dist = Distribution()
         collector = Collector(dist)
         with sandbox.pushd(tmpdir):
             collector.add_requirements_file(requirements, "run")
             collector.add_requirements_file(requirements, "run")
-        assert {"aaa"} == dist.requires.run
+        assert {"aaa", "bbb"} == dist.requires.run
 
     def test_package_collector_run(self):
         dist = Distribution(name="xxx")

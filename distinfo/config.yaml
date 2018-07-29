@@ -6,10 +6,9 @@ collectors:
   - Pipfile
   - ToxIni
   - RequirementsFile
+  - FindTests
   - Nose
   - Pytest
-  # from here are purely informational
-  - FindTests
   - Git
   # - PipReqs
 

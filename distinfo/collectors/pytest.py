@@ -20,6 +20,8 @@ class Pytest(PackageCollector):
         # look for conftest.py files
         conftest = list(self.path.glob("**/conftest.py"))
         if conftest:
+            self.ext.setdefault("tests", set())
+            self.ext.tests |= set(map(lambda p: p.parent, conftest))
             return self.name
 
         # look for ini

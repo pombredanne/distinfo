@@ -79,9 +79,7 @@ class ToxIni(Collector):
                     continue
                 self.add_requirements_file(reqs_file, "test")
             else:
-                # unpin dependencies
-                dep = dep.name.split("==")[0].strip()
-                self.add_requirement(dep, "test")
+                self.add_requirement(dep.name, "test")
 
         # environment
         env = Munch()

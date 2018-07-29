@@ -27,7 +27,7 @@ class TestCollector(Case):
         with sandbox.pushd(tmpdir):
             collector.add_requirements_file(requirements, "run")
             collector.add_requirements_file(requirements, "run")
-        assert {"aaa", "bbb"} == dist.requires.run
+        assert {"aaa", "bbb==1"} == dist.requires.run
 
     def test_package_collector_run(self):
         dist = Distribution(name="xxx")

@@ -44,9 +44,6 @@ class Collector(Base):
             return
         self._seen_files.add(path)
         for req in Requirement.from_file(path):
-            # unpin requirements
-            if req.specifiers.startswith("=="):
-                req.specifiers = ""
             self.add_requirement(req, extra)
 
     def _get_setup_cfg(self):

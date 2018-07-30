@@ -5,6 +5,12 @@ class Pytest(PackageCollector):
 
     name = "pytest"
 
+    def _parse_addopts(self, config):
+        addopts = config.get("addopts", "")
+        if "--cov" in addopts:
+            return "pytest-cov"
+        return self.name
+
     def _requires(self):
 
         # look for setup.cfg section
@@ -12,10 +18,7 @@ class Pytest(PackageCollector):
         if config is not None:
             for key in ("pytest", "tool:pytest"):
                 if key in config:
-                    addopts = config[key].get("addopts", "")
-                    if "--cov" in addopts:
-                        return "pytest-cov"
-                    return self.name
+                    return self._parse_addopts(config[key])
 
         # look for conftest.py files
         conftest = list(self.path.glob("**/conftest.py"))
@@ -25,5 +28,7 @@ class Pytest(PackageCollector):
             return self.name
 
         # look for ini
-        if (self.path / "pytest.ini").exists():
-            return self.name
+        config = self._get_ini_config("pytest.ini")
+        if config is not None:
+            if "pytest" in config:
+                return self._parse_addopts(config["pytest"])

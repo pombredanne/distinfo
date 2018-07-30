@@ -46,12 +46,15 @@ class Collector(Base):
         for req in Requirement.from_file(path):
             self.add_requirement(req, extra)
 
-    def _get_setup_cfg(self):
-        setup = self.path / "setup.cfg"
-        if setup.exists():
+    def _get_ini_config(self, path):
+        path = self.path / path
+        if path.exists():
             config = configparser.ConfigParser()
-            config.read(setup)
+            config.read(path)
             return config
+
+    def _get_setup_cfg(self):
+        return self._get_ini_config("setup.cfg")
 
 
 class PackageCollector(Collector):

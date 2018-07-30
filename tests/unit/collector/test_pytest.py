@@ -12,6 +12,11 @@ SETUPCFG_COV = """
 addopts = --cov
 """
 
+PYTESTINI = """
+[pytest]
+addopts = -v
+"""
+
 
 class TestPytest(Case):
 
@@ -38,6 +43,11 @@ class TestPytest(Case):
         assert not collector.requires
 
     def test_ini(self, tmpdir):
-        tmpdir.join("pytest.ini").write("")
+        tmpdir.join("pytest.ini").write(PYTESTINI)
         collector = self._collect(tmpdir)
         assert {"pytest"} == collector.requires.test
+
+    def test_ini_none(self, tmpdir):
+        tmpdir.join("pytest.ini").write("")
+        collector = self._collect(tmpdir)
+        assert not collector.requires

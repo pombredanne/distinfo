@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 
 class ToxIni(Collector):
 
-    ENV_IGNORE_PATTERN = re.compile("doc|lint")
+    ENV_IGNORE_PATTERN = re.compile("check|cov|doc|lint|report|spell")
 
     def _detox(self, config, expr):
         cwd = os.getcwd()

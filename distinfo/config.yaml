@@ -10,7 +10,7 @@ collectors:
   - Nose
   - Pytest
   - Git
-  # - PipReqs
+  - PipReqs
 
 # import name => package name
 package_aliases:

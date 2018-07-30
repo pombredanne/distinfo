@@ -37,5 +37,5 @@ class PipReqs(Collector):
 
     def _collect(self):
         self.ext.imports = Munch()
-        for package in self.ext.get("packages", []):
+        for package in self.ext.get("packages", set()) | self.ext.get("tests", set()):
             self.ext.imports[package] = self._get_packages(package) - {self.dist.name}

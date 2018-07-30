@@ -32,8 +32,8 @@ class TestDistInfo(Case):
         assert {"appdirs"} == collector.requires.build
         assert {"bbb"} == collector.requires.run
         assert {"ccc", "ddd"} == collector.requires.test
-        assert ["xxx"] == collector.ext.packages
-        assert ["yyy"] == collector.ext.modules
+        assert {"xxx"} == collector.ext.packages
+        assert {"yyy"} == collector.ext.modules
 
     def test_collect_empty(self, caplog, tmpdir):  # pylint: disable=arguments-differ
         super().test_collect_empty(tmpdir)

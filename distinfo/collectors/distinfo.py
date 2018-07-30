@@ -57,6 +57,6 @@ class DistInfo(Collector):
                 self.add_requirement(req, extra)
 
         # get packages
-        self.ext.packages = getattr(dist, "packages", [])
-        self.ext.modules = getattr(dist, "py_modules", [])
+        self.ext.packages = set(getattr(dist, "packages", None) or [])
+        self.ext.modules = set(getattr(dist, "py_modules", None) or [])
         self.ext.hasext = bool(getattr(dist, "ext_modules", []))

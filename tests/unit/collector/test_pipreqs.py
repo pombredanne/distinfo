@@ -25,8 +25,8 @@ class TestPipReqs(Case):
         collector = self._collect(
             tmpdir,
             name="xxx",
-            packages=["xxx", "tests"],
-            tests=["tests"],
+            packages={"xxx", "tests"},
+            tests={"tests"},
             reqs=["ccc"],
         )
         assert collector.ext.imports.xxx == {"aaa", "ccc"}
@@ -39,5 +39,5 @@ class TestPipReqs(Case):
     def test_collect_fail(self, monkeypatch, tmpdir):
         tmpdir.join("xxx").mkdir().join("__init__.py") .write("import aaa")
         monkeypatch.setattr(pipreqs, "get_pkg_names", self._raiser())
-        collector = self._collect(tmpdir, packages=["xxx"])
+        collector = self._collect(tmpdir, packages={"xxx"})
         assert not collector.ext.imports

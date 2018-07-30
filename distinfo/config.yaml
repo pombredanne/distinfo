@@ -1,5 +1,6 @@
 # metadata collectors, executed in order, latter depends on former
 collectors:
+  - Dirty
   - EggInfo
   - DistInfo
   - Pep518
